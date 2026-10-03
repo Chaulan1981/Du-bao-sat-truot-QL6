@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-03 17:54",
+ "updated": "2026-10-03 17:58",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -2915,6 +2915,5 @@
  },
  "khu_vuc": {},
  "da_bao": [],
- "moi": [],
- "ghi_chu": "Lần chạy đầu: chỉ lập nền các vùng thay đổi hiện có, không gửi tin."
+ "moi": []
 }
