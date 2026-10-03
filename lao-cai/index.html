@@ -462,8 +462,8 @@ function insarTxt(v){ return (v>0?'+':'')+fmtVN(v,0)+' mm/năm'; }
 function renderInsar(){
   const box=document.getElementById('insar-box'); if(!box) return; insarLayer.clearLayers();
   const I=INSAR, tt=I&&I.trang_thai;
-  if(!I||tt==='chua_cau_hinh'||tt==='chua_co_so_lieu'){
-    box.innerHTML='<p class="note" style="margin-top:0">Chưa có kết quả InSAR'+(tt==='chua_cau_hinh'?' (đang chờ tài khoản xử lý ảnh ASF HyP3)':'')+
+  if(!I||tt==='chua_cau_hinh'||tt==='cho_duyet'||tt==='chua_co_so_lieu'){
+    box.innerHTML='<p class="note" style="margin-top:0">Chưa có kết quả InSAR'+(tt==='chua_cau_hinh'?' (đang chờ tài khoản xử lý ảnh ASF HyP3)':tt==='cho_duyet'?' (đang chờ ASF duyệt quyền xử lý ảnh HyP3)':'')+
       '. Khi có, hệ thống dùng ảnh radar Sentinel-1 chụp 6 ngày/lần để đo dịch chuyển mặt đất cỡ mm–cm/năm dọc tuyến.</p>'; return; }
   const ch=(I.chong||[]).filter(c=>c.so_giao_thoa);
   let h='<p class="note" style="margin-top:0">Cập nhật '+fmtD(I.cap_nhat.slice(0,10))+'. '+ch.map(c=>'Vệt '+c.vet+': '+c.so_giao_thoa+' giao thoa, '+c.so_ngay_chup+' ngày chụp ('+fmtD(c.tu)+'/'+c.tu.slice(0,4)+' → '+fmtD(c.den)+'/'+c.den.slice(0,4)+'), '+
