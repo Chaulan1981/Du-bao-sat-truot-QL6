@@ -702,9 +702,18 @@ function renderFSMethod(){
     '<li>Dự báo xác suất: tính lại FS với 82 kịch bản mưa tổ hợp ECMWF, GFS → tỷ lệ kịch bản FS &lt; 1 và FS &lt; 1,2.</li></ol>'+
     '<p>FS &lt; '+fmtVN(ng[0],1)+' → Đạt ngưỡng trượt; &lt; '+fmtVN(ng[1],1)+' → Nguy hiểm (nâng mức cảnh báo); &lt; '+fmtVN(ng[2],1)+' → cần chú ý (chỉ hiển thị). ≥ 30% kịch bản FS &lt; 1 hoặc ≥ 50% kịch bản FS &lt; 1,2 cũng nâng lên Nguy hiểm; ≥ 50% kịch bản FS &lt; 1 lên Đạt ngưỡng trượt.</p>'+
     '<table><tr><td>γ / γ<sub>sat</sub></td><td>'+p.gamma+' / '+p.gamma_sat+' kN/m³</td><td>c′, φ′</td><td>'+p.c+' kPa, '+p.phi+'°</td></tr>'+
-    '<tr><td>n = θ<sub>s</sub>, θ<sub>r</sub></td><td>'+fmtVN(p.n,2)+', '+fmtVN(p.theta_r,2)+'</td><td>α, n<sub>vG</sub></td><td>'+fmtVN(p.a_vg,2)+' kPa⁻¹, '+fmtVN(p.n_vg,1)+'</td></tr>'+
+    '<tr><td>n = θ<sub>s</sub>, θ<sub>r</sub></td><td>'+fmtVN(p.n,2)+', '+fmtVN(p.theta_r,2)+'</td><td>α, n<sub>vG</sub></td><td>'+fmtVN(p.a_vg,3)+' kPa⁻¹, '+fmtVN(p.n_vg,2)+'</td></tr>'+
     '<tr><td>S<sub>0</sub></td><td>'+fmtVN(p.S0,2)+'</td><td>k, tỷ lệ thấm</td><td>'+fmtVN(p.k,2)+', '+fmtVN(p.frac,1)+'</td></tr></table>'+
-    '<p><b>Thông số đất là giá trị giả định cho đất tàn tích sét pha</b>, hiệu chỉnh sơ bộ với mưa 2023–2026 và các sự cố đã xác minh (bắt Yagi 9/2024, Km121+700 8/2025, Chiềng Pấc 8/2026; chưa bắt Huổi Lóng 7/2026 do mưa mô hình thấp hơn mưa đo). FS dùng để theo dõi diễn biến theo mưa, không thay cho tính toán thiết kế; cần thí nghiệm cắt trực tiếp, cắt bão hòa và đo SWCC tại tuyến để hiệu chỉnh.</p>';
+    (C.nguon?nguonOD(C):'<p><b>Thông số đất là giá trị giả định cho đất tàn tích sét pha</b>, hiệu chỉnh sơ bộ với mưa 2023–2026 và các sự cố đã xác minh (bắt Yagi 9/2024, Km121+700 8/2025, Chiềng Pấc 8/2026; chưa bắt Huổi Lóng 7/2026 do mưa mô hình thấp hơn mưa đo). FS dùng để theo dõi diễn biến theo mưa, không thay cho tính toán thiết kế; cần thí nghiệm cắt trực tiếp, cắt bão hòa và đo SWCC tại tuyến để hiệu chỉnh.</p>');
+}
+/* Vùng có thông số đất lấy từ thí nghiệm (du_lieu/on_dinh_<vùng>.json): ghi nguồn, cách chọn, kết quả hiệu chỉnh */
+function nguonOD(C){
+  const e=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  return '<p><b>Thông số đất lấy từ thí nghiệm</b> ở các công trình nghiên cứu trượt lở tại Lào Cai:</p><ul style="padding-left:18px;margin:4px 0">'+
+    C.nguon.map(x=>'<li><b>'+e(x.vi_tri)+'</b> – '+e(x.chi_tieu)+' <i>'+e(x.bai)+'</i></li>').join('')+'</ul>'+
+    (C.chon_thong_so?'<p><b>Cách chọn:</b> '+e(C.chon_thong_so)+'</p>':'')+
+    (C.hieu_chinh?'<p><b>Hiệu chỉnh:</b> '+e(C.hieu_chinh)+'</p>':'')+
+    '<p>FS dùng để theo dõi diễn biến theo mưa, không thay cho tính toán thiết kế; thông số lấy từ vài điểm nghiên cứu (chủ yếu Sa Pa) nên cần bổ sung thí nghiệm dọc từng quốc lộ.</p>';
 }
 function setDay(k){DAY=k;renderStrip();renderFS();renderDays();renderMap();renderAlerts();renderGuide();}
 
