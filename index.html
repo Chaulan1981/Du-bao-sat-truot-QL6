@@ -343,14 +343,33 @@ function levelOf(P,P10,isRock){
   if(isRock) lv = Math.max(lv,1);                      // mái đá: luôn cần chú ý
   return {thr,ratio,lv};
 }
-// Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới)
-function evalStation(pr, times, isRock){
+/* Ngưỡng mưa vùng Lào Cai (DATA.nguong_mua = 'qd18') – giống scripts/nguong_mua.py:
+   QĐ 18/2021/QĐ-TTg Điều 46, khu vực 1 (Lào Cai, Yên Bái): mưa 100–200 / >200–400 / >400 mm/24 h kèm số ngày mưa trước
+   và vùng nguy cơ (gần đúng theo độ dốc DEM); cộng ngưỡng thực nghiệm mưa tích lũy > 250 mm + mưa giờ > 40 mm (Nguyễn Châu Lân, 2024). */
+const NGUONG_MUA = DATA.nguong_mua || 'mai_chau', QD18 = NGUONG_MUA === 'qd18';
+const QD_NGAY_MUA = 16, QD_TICH_LUY = 250, QD_GIO = 40, LOP_TXT = ['thấp','trung bình','cao','rất cao'];
+function lopNguyCo(beta){ return beta==null?2 : beta<15?0 : beta<25?1 : beta<35?2 : 3; }
+function capQD18(P,n,l){ let c=0;
+  if(P>=100&&n>=1) c=Math.max(c,[1,1,2,3][l]);
+  if(P>200&&n>2) c=Math.max(c,[1,2,3,3][l]);
+  if(P>400&&n>2) c=Math.max(c,[2,2,3,3][l]);
+  return c; }
+function mucQD18(pr,t,l,hmax){
+  let n=0; while(t-1-n>=0&&pr[t-1-n]>=QD_NGAY_MUA&&n<10) n++;
+  let E=pr[t]; for(let j=t-1;j>=0&&pr[j]>=QD_NGAY_MUA;j--) E+=pr[j];
+  const P=pr[t], cap=capQD18(P,n,l); let lv=cap; if(!cap&&P>=100) lv=1;
+  const tl=E>QD_TICH_LUY&&hmax!=null&&hmax>QD_GIO; if(tl) lv=3;
+  return {thr:100,ratio:P/100,lv,qd18:{cap,n,E,lop:l,hmax},byTL:tl};
+}
+function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return lopNguyCo(g?g.doc:null); }
+// Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới); gio: {ngày: mưa giờ lớn nhất}
+function evalStation(pr, times, isRock, lop, gio){
   const sum=(a,b)=>pr.slice(a,b).reduce((x,y)=>x+y,0);
-  const exceed=t=>{ if(t<10) return false; const P=pr[t]; return P>20 && P/Math.max(MC_A-MC_B*sum(t-10,t),1)>=1; };
+  const exceed=t=>{ if(QD18||t<10) return false; const P=pr[t]; return P>20 && P/Math.max(MC_A-MC_B*sum(t-10,t),1)>=1; };
   const days=[];
   for(let k=0;k<4;k++){
     const t=PAST_DAYS+k, P=pr[t], P10=sum(t-10,t);
-    const o=Object.assign({date:times[t],P,P10,persist:null},levelOf(P,P10,isRock));
+    const o=Object.assign({date:times[t],P,P10,persist:null},QD18?mucQD18(pr,t,lop==null?2:lop,gio?gio[times[t]]:null):levelOf(P,P10,isRock));
     for(let j=1;j<=PERSIST_DAYS;j++){
       if(exceed(t-j)){ o.persist={days:j,date:times[t-j],P:pr[t-j]}; break; }
     }
@@ -432,7 +451,7 @@ function ensMembers(loc){
     .map(k=>d[k]).filter(c=>c.every(x=>x!=null));
   return {times:d.time||[], cols};
 }
-function ensProb(pr, tm, et, cols, isRock){
+function ensProb(pr, tm, et, cols, isRock, lop){
   if(!cols.length) return null; const idx={}; et.forEach((t,i)=>idx[t]=i); const out=[];
   for(let k=0;k<4;k++){
     const t=PAST_DAYS+k; if(!(tm[t] in idx)){ out.push(null); continue; }
@@ -440,7 +459,7 @@ function ensProb(pr, tm, et, cols, isRock){
     cols.forEach(c=>{
       const ser=pr.slice(); for(let kk=0;kk<4;kk++){ const tt=PAST_DAYS+kk; if(tm[tt] in idx) ser[tt]=c[idx[tm[tt]]]||0; }
       const P=ser[t], P10=ser.slice(t-10,t).reduce((a,b)=>a+b,0);
-      lvs.push(levelOf(P,P10,isRock).lv); Ps.push(P);
+      lvs.push(QD18?mucQD18(ser,t,lop==null?2:lop,null).lv:levelOf(P,P10,isRock).lv); Ps.push(P);
     });
     const n=cols.length; Ps.sort((a,b)=>a-b); const q=f=>Ps[Math.min(n-1,Math.round(f*(n-1)))];
     out.push({n, p2:lvs.filter(x=>x>=2).length/n, p3:lvs.filter(x=>x>=3).length/n, P10:q(.1), P50:q(.5), P90:q(.9)});
@@ -457,9 +476,15 @@ async function fetchForecast(){
     : 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
       '&daily=precipitation_sum&past_days='+(PAST_DAYS+PAD_FS)+'&forecast_days=4&timezone=Asia%2FBangkok';
   const ensP = REPLAY ? Promise.resolve(null) : fetchEnsemble(st);   // tổ hợp chỉ có cho dự báo hiện tại
+  const gioP = QD18 ? fetch(REPLAY
+      ? 'https://historical-forecast-api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=precipitation&start_date='+addDays(REPLAY,-3)+'&end_date='+addDays(REPLAY,3)+'&timezone=Asia%2FBangkok'
+      : 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=precipitation&past_days=3&forecast_days=4&timezone=Asia%2FBangkok')
+    .then(r=>r.ok?r.json():null).then(j=>j?(Array.isArray(j)?j:[j]).map(l=>{ const m={}; l.hourly.time.forEach((t,i)=>{ const d=t.slice(0,10); m[d]=Math.max(m[d]||0,l.hourly.precipitation[i]||0); }); return m; }):null).catch(()=>null)
+    : Promise.resolve(null);
   const r = await fetch(url);
   if(!r.ok) throw new Error('Máy chủ Open-Meteo trả lỗi '+r.status);
   let j = await r.json(); if(!Array.isArray(j)) j=[j];
+  const GIO = await gioP;
   const res = st.map((s,i)=>{
     const d = j[i].daily, prF = d.precipitation_sum.map(v=>v||0), tmF = d.time;
     const off = prF.length-(PAST_DAYS+4);
@@ -467,7 +492,8 @@ async function fetchForecast(){
     const sr = satRainFor(s.id); let satDays = 0;          // ngày đã qua: lấy max(Open-Meteo, vệ tinh)
     if(sr) for(let t=0;t<=off+PAST_DAYS;t++){ const x=sr[tmF[t]]; if(x!=null&&x>prF[t]){ prF[t]=x; satDays++; } }
     const pr = prF.slice(off), time = tmF.slice(off);
-    const o = Object.assign({},s,{pr,time,prF,tmF,off,days:evalStation(pr,time,s.type==='da'),satDays});
+    const lop = QD18 ? lopCua(s) : null;
+    const o = Object.assign({},s,{pr,time,prF,tmF,off,lop,days:evalStation(pr,time,s.type==='da',lop,GIO&&GIO[i]),satDays});
     if(s.type!=='da'&&window.OD){                            // ổn định mái theo mưa + SWCC (không áp dụng cho vách đá)
       const p=OD.thamSo(s,null,DH), ser=OD.chuoiFS(prF,p), a0=off+PAST_DAYS-14;
       o.odp=p; o.od={beta:p.beta_tinh,nguon:p.nguon_doc,D:p.D,FSkho:OD.fsKho(p)};
@@ -478,7 +504,7 @@ async function fetchForecast(){
   });
   const ens = await ensP; ENS_N = 0;
   if(ens) res.forEach((s,i)=>{
-    const m=ensMembers(ens[i]); const pe=ensProb(s.pr,s.time,m.times,m.cols,s.type==='da'); if(!pe) return;
+    const m=ensMembers(ens[i]); const pe=ensProb(s.pr,s.time,m.times,m.cols,s.type==='da',s.lop); if(!pe) return;
     ENS_N=m.cols.length;
     s.days.forEach((o,k)=>{ const e=pe[k]; if(!e) return; o.ens=e; const pl=probLevel(e); if(pl>o.lv){ o.lv=pl; o.byEns=true; } });
     if(s.odp&&m.cols.length){                                 // xác suất FS < 1 theo từng kịch bản mưa
@@ -496,6 +522,7 @@ async function fetchForecast(){
   return res;
 }
 function fmtD(iso){return iso.slice(8,10)+'/'+iso.slice(5,7);}
+function muaTxt(d){ return QD18 ? qd18Txt(d) : 'mưa '+d.P.toFixed(0)+' mm, 10 ngày trước '+d.P10.toFixed(0)+' mm; ngưỡng Mai Châu '+d.thr.toFixed(0)+' mm (tỷ số '+d.ratio.toFixed(2)+')'; }
 function persistTxt(d){return 'Sau mưa vượt ngưỡng ngày '+fmtD(d.persist.date)+' ('+d.persist.P.toFixed(0)+' mm, '+d.persist.days+' ngày trước)';}
 
 /* ---------- Hiển thị ---------- */
@@ -510,7 +537,7 @@ function renderStrip(){
       const onlyPersist=rows.filter(d=>d.lv===lv).every(d=>d.byPersist);
       const pe=rows.filter(d=>d.ens); const p3=pe.length?Math.max(...pe.map(d=>d.ens.p3)):null;
       h+='<div role="gridcell" tabindex="0" class="cellx lv'+lv+(k===DAY?' sel':'')+'" data-day="'+k+'" data-zone="'+z.id+'" style="background:'+LV_COL[lv]+'" '+
-         'aria-label="'+z.tinh+' '+DAY_TXT[k]+': '+LV_TXT[lv]+(onlyPersist?' sau mưa':'')+(p3!=null?', xác suất đạt ngưỡng '+Math.round(p3*100)+'%':'')+'">'+LV_SHORT[lv]+'<small>'+(onlyPersist?'sau mưa':p3!=null?Math.round(p3*100)+'%':rt.toFixed(2))+'</small>'+
+         'aria-label="'+z.tinh+' '+DAY_TXT[k]+': '+LV_TXT[lv]+(onlyPersist?' sau mưa':'')+(p3!=null?', xác suất đạt ngưỡng '+Math.round(p3*100)+'%':'')+'">'+LV_SHORT[lv]+'<small>'+(onlyPersist?'sau mưa':p3!=null?Math.round(p3*100)+'%':QD18?Math.round(rt*100)+' mm':rt.toFixed(2))+'</small>'+
          (p3!=null&&!onlyPersist?'<span class="pb" aria-hidden="true"><i style="width:'+Math.max(2,Math.round(p3*100))+'%"></i></span>':'')+'</div>';
     }
   });
@@ -541,8 +568,9 @@ function renderMap(){
     const xy=snapXY(s);
     L.circleMarker([xy[1],xy[0]],{radius:s.type==='da'?9:7,color:'#fff',weight:2,fillColor:LV_COL[d.lv],fillOpacity:1})
      .bindPopup('<div class="pop"><b>'+s.id+'</b><br>'+DAY_TXT[DAY]+' ('+d.date+')<br><b style="color:'+LV_COL[d.lv]+'">'+LV_TXT[d.lv]+'</b>'+
-       '<table><tr><td>Mưa ngày P</td><td>'+d.P.toFixed(1)+' mm</td></tr><tr><td>Mưa 10 ngày trước</td><td>'+d.P10.toFixed(0)+' mm</td></tr>'+
-       '<tr><td>Ngưỡng Mai Châu</td><td>'+d.thr.toFixed(0)+' mm</td></tr><tr><td>Tỷ số P/ngưỡng</td><td>'+d.ratio.toFixed(2)+'</td></tr>'+
+       '<table><tr><td>Mưa ngày P</td><td>'+d.P.toFixed(1)+' mm</td></tr>'+(d.qd18?qd18Rows(d):
+       '<tr><td>Mưa 10 ngày trước</td><td>'+d.P10.toFixed(0)+' mm</td></tr>'+
+       '<tr><td>Ngưỡng Mai Châu</td><td>'+d.thr.toFixed(0)+' mm</td></tr><tr><td>Tỷ số P/ngưỡng</td><td>'+d.ratio.toFixed(2)+'</td></tr>')+
        (s.satDays?'<tr><td>Mưa vệ tinh</td><td>dùng cho '+s.satDays+' ngày</td></tr>':'')+
        (d.ens?'<tr><td>Xác suất đạt ngưỡng</td><td><b>'+Math.round(d.ens.p3*100)+'%</b> ('+d.ens.n+' kịch bản)</td></tr>'+
               '<tr><td>Xác suất ≥ Nguy hiểm</td><td>'+Math.round(d.ens.p2*100)+'%</td></tr>'+
@@ -565,11 +593,20 @@ function fsTxt(x){
   return 'Hệ số an toàn mái FS '+fmtVN(x.fs.FS,2)+' (đới ngấm '+fmtVN(x.fs.h,1)+' m'+(x.fs.hw>0?', nước treo '+fmtVN(x.fs.hw,1)+' m':'')+')'+
     (x.fsEns?', '+Math.round(x.fsEns.p1*100)+'% kịch bản FS < 1':'');
 }
+function qd18Rows(d){ const q=d.qd18, r=(a,b)=>'<tr><td>'+a+'</td><td>'+b+'</td></tr>';
+  return r('Ngày mưa liền trước','≥ 16 mm: '+q.n+' ngày')+r('Mưa tích lũy đợt',q.E.toFixed(0)+' mm')+
+    (q.hmax!=null?r('Mưa giờ lớn nhất',q.hmax.toFixed(1)+' mm'):'')+r('Vùng nguy cơ (theo độ dốc)',LOP_TXT[q.lop])+
+    r('Rủi ro QĐ 18/2021',q.cap?'<b>cấp '+q.cap+'</b> (khu vực 1)':(d.P>=100?'mưa ≥ 100 mm nhưng chưa có ngày mưa trước':'dưới cấp 1'))+
+    (d.byTL?r('Ngưỡng tích lũy','<b>vượt</b> 250 mm + 40 mm/h'):''); }
+function qd18Txt(x){ const q=x.qd18;
+  if(x.byTL) return 'Mưa tích lũy '+q.E.toFixed(0)+' mm và mưa giờ '+q.hmax.toFixed(0)+' mm vượt ngưỡng 250 mm + 40 mm/h';
+  return 'Mưa '+x.P.toFixed(0)+' mm/24 h sau '+q.n+' ngày mưa, vùng nguy cơ '+LOP_TXT[q.lop]+(q.cap?' → rủi ro cấp '+q.cap+' (QĐ 18/2021)':''); }
 function reasonTxt(x){
   if(x.byPersist) return persistTxt(x);
   if(x.byFs) return fsTxt(x)+'; mưa '+x.P.toFixed(0)+' mm';
   if(x.byEns) return Math.round(x.ens.p3*100)+'% trong '+x.ens.n+' kịch bản đạt ngưỡng trượt; mưa 90%: '+x.ens.P90.toFixed(0)+' mm (dự báo chính '+x.P.toFixed(0)+' mm)';
   if(x.s.type==='da'&&x.lv===1&&x.ratio<0.7) return 'Điểm đá đổ: luôn cần chú ý, kể cả khi không mưa';
+  if(x.qd18) return qd18Txt(x)+(x.ens?', xác suất đạt cấp 3: '+Math.round(x.ens.p3*100)+'%':'');
   return 'Mưa '+x.P.toFixed(0)+' mm, ngưỡng '+x.thr.toFixed(0)+' mm (tỷ số '+x.ratio.toFixed(2)+')'+(x.ens?', xác suất đạt ngưỡng '+Math.round(x.ens.p3*100)+'%':'');
 }
 function renderAlerts(){                         // cảnh báo theo vùng (như varsom.no, MeteoAlarm), mở ra xem từng điểm
@@ -580,7 +617,7 @@ function renderAlerts(){                         // cảnh báo theo vùng (như
     if(pts.length) groups.push({z,pts,lv:pts[0].lv});
   });
   groups.sort((a,b)=>b.lv-a.lv);
-  if(!groups.length){ul.innerHTML='<li style="border-left-color:'+LV_COL[0]+'"><b>Không có điểm cần cảnh báo</b><span>Mưa dự báo dưới 70% ngưỡng gây trượt, xác suất tổ hợp thấp, hệ số an toàn mái dốc ≥ 1,2 và 7 ngày qua không có ngày vượt ngưỡng.</span></li>';return;}
+  if(!groups.length){ul.innerHTML='<li style="border-left-color:'+LV_COL[0]+'"><b>Không có điểm cần cảnh báo</b><span>'+(QD18?'Mưa dự báo dưới mức rủi ro cấp 1 (QĐ 18/2021), xác suất tổ hợp thấp và hệ số an toàn mái dốc ≥ 1,2.':'Mưa dự báo dưới 70% ngưỡng gây trượt, xác suất tổ hợp thấp, hệ số an toàn mái dốc ≥ 1,2 và 7 ngày qua không có ngày vượt ngưỡng.')+'</span></li>';return;}
   ul.innerHTML=groups.map((g,i)=>{
     const top=g.pts[0], same=g.pts.filter(x=>x.lv===g.lv).length;
     return '<li data-i="'+i+'" style="border-left-color:'+LV_COL[g.lv]+'"><b>'+g.z.tinh+' '+zNhan(g.z)+' – '+LV_TXT[g.lv]+'</b>'+

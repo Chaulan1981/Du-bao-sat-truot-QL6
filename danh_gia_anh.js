@@ -3,7 +3,7 @@
 //  1. Vị trí: GPS trong EXIF của ảnh -> nếu không có: vị trí máy hoặc chọn trên bản đồ.
 //  2. Địa hình: lưới 5×5 điểm cách 60 m, cao độ DEM Copernicus 90 m (Open-Meteo Elevation API) -> độ dốc (Horn),
 //     hướng dốc, chênh cao; góc mái tính toán = độ dốc lớn nhất của lưới (hoặc góc người dùng đo).
-//  3. Mưa tại đúng điểm: 45 ngày qua + 4 ngày tới, 82 kịch bản tổ hợp -> ngưỡng Mai Châu và hệ số an toàn FS (on_dinh.js).
+//  3. Mưa tại đúng điểm: 45 ngày qua + 4 ngày tới, 82 kịch bản tổ hợp -> ngưỡng mưa của vùng (Mai Châu hoặc QĐ 18/2021) và FS.
 //  4. Ảnh: phân loại điểm ảnh – thực vật, đất, đá/đất sáng mới lộ, bóng tối, bầu trời -> ghi chú hiện trạng mái.
 //  5. Bối cảnh: khoảng cách tới tuyến (QL6 hoặc các quốc lộ của vùng), điểm dự báo gần nhất, điểm trượt đã điều tra, điểm nguy cơ của Cục Đường bộ.
 (function () {
@@ -109,10 +109,11 @@
       fetch('https://ensemble-api.open-meteo.com/v1/ensemble?' + q + '&forecast_days=4&models=' + ENS_MODELS).catch(() => null)]);
     if (!rf.ok) throw new Error('Không lấy được mưa dự báo');
     const d = (await rf.json()).daily, prF = d.precipitation_sum.map(v => v || 0), tmF = d.time, off = prF.length - (PAST_DAYS + 4);
-    const pr = prF.slice(off), tm = tmF.slice(off), days = evalStation(pr, tm, laDa);
+    const lop = QD18 ? lopNguyCo(beta) : null;
+    const pr = prF.slice(off), tm = tmF.slice(off), days = evalStation(pr, tm, laDa, lop, null);
     let ens = null; try { if (re && re.ok) ens = await re.json(); } catch (_) {}
     const m = ens ? ensMembers(ens) : {times: [], cols: []};
-    const pe = ensProb(pr, tm, m.times, m.cols, laDa);
+    const pe = ensProb(pr, tm, m.times, m.cols, laDa, lop);
     if (pe) days.forEach((o, k) => { if (pe[k]) { o.ens = pe[k]; const pl = probLevel(pe[k]); if (pl > o.lv) { o.lv = pl; o.byEns = true; } } });
     let od = null, chart = null;
     if (!laDa && window.OD) {
@@ -198,7 +199,7 @@
       hang('Vị trí', 'cách ' + TEN_TUYEN + ' ' + (r.bc.dTuyen < 1000 ? Math.round(r.bc.dTuyen) + ' m' : fmtVN(r.bc.dTuyen / 1000, 1) + ' km') + '; điểm dự báo gần nhất ' + r.bc.gan.s.id + ' (' + fmtVN(r.bc.gan.d / 1000, 1) + ' km)') +
       hang('Trong bán kính 1 km', r.bc.trUot + ' điểm trượt đã điều tra' + (r.bc.nguyCo.length ? '; điểm nguy cơ Cục ĐB: ' + r.bc.nguyCo.join(', ') : '')) +
       hang('Địa hình (DEM)', 'cao độ ' + Math.round(r.dh.caoDo) + ' m; dốc tại điểm ' + fmtVN(r.dh.docTam, 0) + '°, dốc nhất ' + fmtVN(r.dh.docMax, 0) + '°; mái quay hướng ' + huongTxt(r.dh.huong) + '; chênh cao ' + Math.round(r.dh.chenhCao) + ' m trong 240 m') +
-      hang('Mưa hôm nay', fmtVN(d0.P, 0) + ' mm; 10 ngày trước ' + fmtVN(d0.P10, 0) + ' mm; ngưỡng Mai Châu ' + fmtVN(d0.thr, 0) + ' mm (tỷ số ' + fmtVN(d0.ratio, 2) + ')' + (d0.ens ? '; xác suất đạt ngưỡng ' + Math.round(d0.ens.p3 * 100) + '%' : ''));
+      hang('Mưa hôm nay', muaTxt(d0) + (d0.ens ? '; xác suất đạt mức cao nhất ' + Math.round(d0.ens.p3 * 100) + '%' : ''));
     if (r.laDa) h += hang('Ổn định', 'Mái đá' + (r.loai === 'tu' ? ' (nhận từ ảnh)' : '') + ': mô hình đất theo mưa không áp dụng; ổn định vách đá do hệ khe nứt quyết định – cần đo thế nằm khe nứt tại hiện trường để phân tích động học.');
     else h += hang('Hệ số an toàn FS', '<b style="color:' + (d0.fsLv === 1 ? '#7a5d00' : LV_COL[d0.fsLv]) + '">' + fmtVN(f.FS, 2) + '</b> hôm nay (khô ' + fmtVN(o.FSkho, 2) + '); 3 ngày tới: ' +
         r.md.days.slice(1).map(x => fmtVN(x.fs.FS, 2) + (x.fsEns ? ' (' + Math.round(x.fsEns.p1 * 100) + '% FS&lt;1)' : '')).join(' · ')) +
