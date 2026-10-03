@@ -210,6 +210,14 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       <li style="border-left-color:#C8322B;cursor:default"><b>Bỏ sót</b><span>QL279 Km79+200 (Bảo Hà) 30/9/2026: mưa các ngày trước dưới 10 mm/ngày, đoạn mái đã hư hại từ bão Yagi 2024 – sạt không do mưa nên ngưỡng mưa và FS không báo được</span></li>
     </ul>
     <p class="note">Tần suất báo động theo ngưỡng mưa QĐ 18/2021 từ cấp 2 (Nguy hiểm): khoảng 1–2 ngày mỗi tuyến mỗi năm; theo hệ số an toàn FS &lt; 1,2 (thông số đất theo thí nghiệm tại Lào Cai): khoảng 12 ngày-tuyến mỗi năm cho cả 5 tuyến, nhiều nhất QL32 (~6) và QL279 (~4), QL4D, QL4E dưới 1 (trước đây dùng thông số đất QL6: ~98). Mẫu sự cố còn rất nhỏ (3 vụ).</p>
+    <p class="note"><b>Kiểm định với 37 vụ sạt lở do mưa năm 2026</b> (theo báo chí, 05–09/2026: QL4D, QL32, QL279, QL4E, đường tỉnh, khu dân cư; vị trí ước lượng theo xã/lý trình, mưa Open-Meteo không kể mưa vệ tinh và tổ hợp):
+      chỉ <b>2/37 vụ</b> đạt từ Nguy hiểm trong cửa sổ −3…+1 ngày – San Lùng, Bản Xèo 28/7 (mưa mô hình 110 mm/ngày → cấp 3 QĐ 18) và Hạnh Phúc, Trạm Tấu 15/9 (FS 1,08); không vụ nào được báo trước.</p>
+    <ul class="alerts" style="margin-top:8px">
+      <li style="border-left-color:#C8322B;cursor:default"><b>Nguyên nhân chính</b><span>Mưa mô hình thấp hơn nhiều mưa trạm đo tại chỗ: Minh Lương 16/7 trạm 123,6 mm – mô hình 23 mm; Nậm Xé 107 – 26 mm; Liễu Đô 2–3/8 137 – 12 mm; Cao Phạ 14–15/9 174,6 – 75 mm.
+        Phần lớn các vụ 2026 là sạt taluy, sạt sau nhà quy mô nhỏ khi mưa mô hình chỉ 20–60 mm/ngày, dưới ngưỡng 100 mm/24 h của QĐ 18.</span></li>
+      <li style="border-left-color:#E3B505;cursor:default"><b>Hạ ngưỡng chưa đủ</b><span>Với cùng mưa mô hình, ngưỡng mưa tích lũy từ 100 mm bắt 14/37 vụ nhưng báo động khoảng 10 ngày/điểm/năm; mưa ngày từ 50 mm bắt 10/37 vụ (khoảng 4 ngày/điểm/năm).
+        Cần đưa mưa trạm đo tự động của tỉnh vào hệ thống và hiệu chỉnh lại ngưỡng, thông số FS trên toàn bộ sự cố 2023–2026.</span></li>
+    </ul>
 
     <p class="note">Lý trình trên trang là khoảng cách tính từ đầu đoạn tuyến trong tỉnh (theo OpenStreetMap), không phải Km chính thức của quốc lộ.
       Mức cảnh báo mỗi ngày được lưu vào <a href="data/luu_tru/canhbao_lich_su.csv">file lịch sử</a> để đối chiếu khi có thêm sự cố.</p>
@@ -262,7 +270,7 @@ const LV_SHORT = ['An toàn','Chú ý','Nguy hiểm','Vượt ngưỡng'];
 const LV_COL = ['#1E7B46','#E3B505','#B5560C','#C8322B'];
 let DAY_TXT = ['Hôm nay','Ngày mai','+2 ngày','+3 ngày'];
 let REPLAY = null;                       // 'YYYY-MM-DD' khi đang xem lại
-const EVENTS = [["2024-09-09", "Bão Yagi (số 3): sạt taluy, đất đá tràn mặt đường tại 20 điểm QL70 (Yên Bái)"], ["2024-09-10", "Làng Nủ (Phúc Khánh, Bảo Yên): lũ quét, sạt lở vùi lấp thôn"], ["2025-09-29", "Đèo Khau Phạ QL32: 30–40 điểm sạt từ 29/9, Km269 sụt khoảng 30 m đường"], ["2026-09-30", "QL279 Km79+200 (Bảo Hà): sạt taluy khoảng 10.000–25.000 m³, tắc đường"]];   // sự cố đã xác minh (báo chí)
+const EVENTS = [["2024-09-09", "Bão Yagi (số 3): sạt taluy, đất đá tràn mặt đường tại 20 điểm QL70 (Yên Bái)"], ["2024-09-10", "Làng Nủ (Phúc Khánh, Bảo Yên): lũ quét, sạt lở vùi lấp thôn"], ["2025-09-29", "Đèo Khau Phạ QL32: 30–40 điểm sạt từ 29/9, Km269 sụt khoảng 30 m đường"], ["2026-05-04", "QL4D Km120+900 (Tả Phìn): đá đổ taluy, tắc đường lên Sa Pa"], ["2026-07-16", "Mưa lớn Mù Cang Chải, Văn Bàn: sạt QL32, QL279 (Minh Lương, Nậm Xé), hàng trăm điểm ở Chế Tạo"], ["2026-07-27", "QL32 Km328+550 (Khao Mang): sạt khoảng 800 m³, tắc đường"], ["2026-07-28", "San Lùng, Bản Xèo (Bát Xát): sạt khoảng 36.000 m³"], ["2026-08-05", "Thủy điện Mý Háng Tầu (Chế Tạo): sạt lớn, 1 người chết"], ["2026-09-14", "Mưa lớn Văn Chấn, Trạm Tấu: sạt QL32 Km265+900 (Tú Lệ), Phình Hồ, Mỏ Vàng"], ["2026-09-19", "Tân Hợp (Văn Yên): sạt 5.000–10.000 m³, cô lập 37 hộ"], ["2026-09-30", "QL279 Km79+200 (Bảo Hà): sạt taluy khoảng 10.000–25.000 m³, tắc đường"]];   // sự cố đã xác minh (báo chí)
 function addDays(iso,n){const d=new Date(iso+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10);}
 const REFRESH_MIN = 30;
 const PERSIST_DAYS = 7;   // duy trì cảnh báo sau ngày mưa vượt ngưỡng (kiểm định 2023–2026)
