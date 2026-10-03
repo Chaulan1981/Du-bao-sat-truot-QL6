@@ -78,6 +78,9 @@ body.xem-lai aside{background:#FBF4E6}body.xem-lai .status{border-color:var(--oc
 .pop td{padding:1px 8px 1px 0}
 .hs{width:12px;height:12px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
 .hs.s1{background:#6B3FA0;transform:rotate(45deg)} .hs.s2{background:#0E7C7B;border-radius:2px}
+.hs.ins{background:#C8322B;border-radius:50%;width:13px;height:13px}
+.leaflet-image-layer.insar-anh{image-rendering:pixelated}
+.thang-insar{height:10px;border-radius:3px;background:linear-gradient(90deg,#c80000,#c8c8c8,#0000c8);margin:4px 0 2px;max-width:280px}
 .sat-zone{display:grid;grid-template-columns:72px 1fr;gap:2px 8px;font-size:12.5px;margin:6px 0}
 .sat-zone b{font-size:12.5px}.sat-zone span{color:var(--muted)}
 .guide{display:grid;gap:8px}
@@ -174,6 +177,8 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
   <section id="sat-sec">
     <h2>Theo dõi bằng vệ tinh</h2>
     <div id="sat-box"><p class="note" style="margin-top:0">Đang tải số liệu vệ tinh…</p></div>
+    <h3 style="margin:14px 0 4px;font-size:15px">Dịch chuyển mặt đất bằng giao thoa radar (InSAR)</h3>
+    <div id="insar-box"><p class="note" style="margin-top:0">Đang tải số liệu InSAR…</p></div>
   </section>
 
   <section>
@@ -186,12 +191,13 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       <span><i style="background:var(--ochre);border-radius:2px"></i>Điểm trượt đã ghi nhận</span>
       <span><i style="background:#6B3FA0;border-radius:1px;transform:rotate(45deg)"></i>Thay đổi trên ảnh radar Sentinel-1</span>
       <span><i style="background:#0E7C7B;border-radius:1px"></i>Mất lớp phủ trên ảnh Sentinel-2</span>
+      <span><i style="background:#C8322B;border-radius:50%"></i>Vùng dịch chuyển phát hiện bằng InSAR</span>
     </div>
     <p class="note"><b>Ngưỡng mưa cho Lào Cai</b> (không dùng ngưỡng Mai Châu của QL6):<br>
       1) <b>Quyết định 18/2021/QĐ-TTg, Điều 46</b> – Lào Cai, Yên Bái thuộc khu vực 1. Mưa 100–200 mm/24 h sau 1–2 ngày mưa: vùng nguy cơ thấp, trung bình → cấp 1; cao → cấp 2; rất cao → cấp 3.
       Mưa trên 200–400 mm/24 h sau hơn 2 ngày mưa: thấp → cấp 1; trung bình → cấp 2; cao, rất cao → cấp 3. Mưa trên 400 mm/24 h sau hơn 2 ngày mưa: thấp, trung bình → cấp 2; cao, rất cao → cấp 3.
       Trên trang: cấp 1 = Cần chú ý, cấp 2 = Nguy hiểm, cấp 3 = Đạt ngưỡng trượt; “ngày mưa” là ngày có mưa từ 16 mm (mưa vừa trở lên);
-      vùng nguy cơ lấy gần đúng theo độ dốc địa hình (dưới 15° thấp, 15–25° trung bình, 25–35° cao, từ 35° rất cao) khi chưa có bản đồ phân vùng chính thức; điểm dự báo có điểm sạt trượt đã điều tra (cấp rủi ro 2–3) trong bán kính 1 km được nâng vùng nguy cơ lên một bậc;
+      vùng nguy cơ lấy gần đúng theo độ dốc địa hình (dưới 15° thấp, 15–25° trung bình, 25–35° cao, từ 35° rất cao) khi chưa có bản đồ phân vùng chính thức; điểm dự báo có điểm sạt trượt đã điều tra (cấp rủi ro 2–3) trong bán kính 1 km hoặc có dịch chuyển InSAR từ 20 mm/năm được nâng vùng nguy cơ lên một bậc;
       mưa từ 100 mm nhưng chưa có ngày mưa trước → Cần chú ý.<br>
       2) <b>Ngưỡng thực nghiệm</b> từ các trận Liên Minh (Sa Pa, 2023) và Làng Nủ (Bảo Yên, 2024): mưa 1 giờ trên 40 mm và mưa tích lũy trên 250 mm có thể gây trượt lở, lũ bùn đá
       (Nguyễn Châu Lân, Tuổi Trẻ 03/10/2024) → Đạt ngưỡng trượt; mưa giờ lấy từ dự báo theo giờ của Open-Meteo.</p>
@@ -231,6 +237,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       <li><a href="data/canhbao.geojson" download>Mức cảnh báo dạng GeoJSON</a> <span>mở bằng QGIS, ArcGIS, Google Earth</span></li>
       <li><a href="data/luu_tru/canhbao_lich_su.csv" download>Lịch sử cảnh báo hằng ngày (CSV)</a> <span>để tính tỷ lệ bắt đúng, báo nhầm</span></li>
       <li><a href="data/vetinh.json">Mưa vệ tinh (JSON)</a> <span>GSMaP/IMERG tại các điểm dự báo</span></li>
+      <li><a href="data/insar.json">Dịch chuyển mặt đất InSAR (JSON)</a> <span>tốc độ Sentinel-1 theo điểm dự báo, vùng dịch chuyển</span></li>
     </ul>
     <p class="note">Nguồn: dự báo Open-Meteo (CC BY 4.0) gồm ECMWF IFS và NOAA GFS; mưa vệ tinh JAXA GSMaP, NASA GPM IMERG;
       ảnh Copernicus Sentinel-1/2 qua Google Earth Engine; đường GRIP4 và © OpenStreetMap. Mã nguồn hệ thống không công khai;
@@ -309,6 +316,7 @@ const offLayer = L.layerGroup().addTo(map);
 DATA.official.forEach(o=>L.marker([o.xy[1],o.xy[0]],{icon:L.divIcon({className:'',html:'<div class="tri"></div>',iconSize:[16,14],iconAnchor:[8,10]})})
   .bindPopup('<div class="pop"><b>'+o.ten+'</b><br>Điểm nguy cơ cao (Cục Đường bộ, 17/12/2025)</div>').addTo(offLayer));
 const satLayer = L.layerGroup().addTo(map);
+const insarLayer = L.layerGroup();               // ảnh tốc độ InSAR + vùng dịch chuyển (bật khi có kết quả)
 const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
   {maxZoom:17,attribution:'© OpenStreetMap, SRTM | Kiểu bản đồ © OpenTopoMap (CC BY-SA)'});
 L.control.scale({metric:true,imperial:false}).addTo(map);
@@ -343,7 +351,7 @@ function snapXY(s){                               // điểm dự báo trên tuy
   return bd<(0.004**2)?best:s.xy;
 }
 L.control.layers({'Bản đồ nền':osm,'Địa hình':topo,'Ảnh vệ tinh':sat},
-  {'Điểm dự báo':stLayer,'Điểm trượt đã điều tra':lsLayer,'Điểm nguy cơ Cục ĐB':offLayer,'Thay đổi phát hiện từ vệ tinh':satLayer},{collapsed:true}).addTo(map);
+  {'Điểm dự báo':stLayer,'Điểm trượt đã điều tra':lsLayer,'Điểm nguy cơ Cục ĐB':offLayer,'Thay đổi phát hiện từ vệ tinh':satLayer,'Dịch chuyển InSAR (mm/năm)':insarLayer},{collapsed:true}).addTo(map);
 map.fitBounds(L.latLngBounds(DATA.zones.flatMap(z=>z.line.map(p=>[p[1],p[0]]))).pad(0.15));
 
 /* ---------- Tính cảnh báo ---------- */
@@ -443,6 +451,49 @@ function renderSat(){
   box.innerHTML=h;
   const ul=document.getElementById('sat-list');
   if(ul) ul.querySelectorAll('li').forEach(li=>li.onclick=()=>{const x=list[+li.dataset.i];map.setView([x.v.xy[1],x.v.xy[0]],15);});
+}
+/* ---------- InSAR Sentinel-1 (job GitHub Actions + ASF HyP3, chuỗi SBAS) ---------- */
+let INSAR = null;
+async function loadInsar(){
+  try{ const r=await fetch('data/insar.json',{cache:'no-store'}); if(r.ok) INSAR=await r.json(); }catch(_){}
+  renderInsar(); if(RESULT) renderMap();           // thêm dòng InSAR vào popup điểm dự báo
+}
+function insarTxt(v){ return (v>0?'+':'')+fmtVN(v,0)+' mm/năm'; }
+function renderInsar(){
+  const box=document.getElementById('insar-box'); if(!box) return; insarLayer.clearLayers();
+  const I=INSAR, tt=I&&I.trang_thai;
+  if(!I||tt==='chua_cau_hinh'||tt==='chua_co_so_lieu'){
+    box.innerHTML='<p class="note" style="margin-top:0">Chưa có kết quả InSAR'+(tt==='chua_cau_hinh'?' (đang chờ tài khoản xử lý ảnh ASF HyP3)':'')+
+      '. Khi có, hệ thống dùng ảnh radar Sentinel-1 chụp 6 ngày/lần để đo dịch chuyển mặt đất cỡ mm–cm/năm dọc tuyến.</p>'; return; }
+  const ch=(I.chong||[]).filter(c=>c.so_giao_thoa);
+  let h='<p class="note" style="margin-top:0">Cập nhật '+fmtD(I.cap_nhat.slice(0,10))+'. '+ch.map(c=>'Vệt '+c.vet+': '+c.so_giao_thoa+' giao thoa, '+c.so_ngay_chup+' ngày chụp ('+fmtD(c.tu)+'/'+c.tu.slice(0,4)+' → '+fmtD(c.den)+'/'+c.den.slice(0,4)+'), '+
+    c.diem_anh_tin_cay+' điểm ảnh 80 m tin cậy').join('; ')+'.</p>';
+  if(tt!=='ok'){ box.innerHTML=h+'<p class="note">Đang tích lũy ảnh: cần ít nhất 15 ngày chụp và 4 tháng số liệu mới công bố tốc độ.</p>'; return; }
+  (I.anh||[]).forEach(a=>L.imageOverlay('data/'+a.tep,a.bien,{opacity:.85,interactive:false,className:'insar-anh'}).addTo(insarLayer));
+  const hs=I.diem_nong||[];
+  hs.forEach(x=>L.marker([x.xy[1],x.xy[0]],{icon:L.divIcon({className:'',html:'<div class="hs ins"></div>',iconSize:[15,15],iconAnchor:[7,7]})})
+    .bindPopup('<div class="pop"><b>Vùng dịch chuyển (InSAR)</b><br>Tốc độ theo hướng nhìn vệ tinh: <b>'+insarTxt(x.v_tb)+'</b> (lớn nhất '+insarTxt(x.v_max)+')'+
+      '<br>Diện tích '+fmtVN(x.dien_tich_ha,1)+' ha, cách tuyến '+x.cach_tuyen_m+' m, gần điểm '+x.diem_gan+
+      '<br>Cần kiểm tra hiện trường: có thể là trượt chậm, lún nền đắp, hoặc nhiễu do khí quyển, thực vật.</div>').addTo(insarLayer));
+  if(!map.hasLayer(insarLayer)) insarLayer.addTo(map);
+  h+='<div class="thang-insar"></div><p class="note" style="margin-top:0">−40 ← ra xa vệ tinh · 0 · về phía vệ tinh → +40 mm/năm (ảnh màu lớp “Dịch chuyển InSAR”).</p>';
+  if(hs.length){
+    h+='<ul class="alerts" id="insar-list">'+hs.slice(0,8).map((x,i)=>'<li data-i="'+i+'" style="border-left-color:#C8322B"><b>Gần '+x.diem_gan+': '+insarTxt(x.v_tb)+'</b><span>'+
+      fmtVN(x.dien_tich_ha,1)+' ha · cách tuyến '+x.cach_tuyen_m+' m</span></li>').join('')+'</ul>';
+  } else h+='<p class="note">Chưa thấy vùng dịch chuyển từ '+fmtVN(I.nguong.dich_chuyen,0)+' mm/năm trong hành lang 1 km quanh tuyến.</p>';
+  h+='<p class="note">InSAR đo dịch chuyển chậm trước khi sạt (trượt bò, nứt, lún); không thấy được sạt nhanh, vách đá rất dốc và vùng rừng rậm (mất kết hợp). '+
+    'Điểm dự báo có dịch chuyển từ '+fmtVN(I.nguong.dich_chuyen,0)+' mm/năm được tính vào vùng nguy cơ cao hơn một bậc.</p>';
+  box.innerHTML=h;
+  const ul=document.getElementById('insar-list');
+  if(ul) ul.querySelectorAll('li').forEach(li=>li.onclick=()=>{const x=hs[+li.dataset.i];map.setView([x.xy[1],x.xy[0]],15);});
+}
+function insarRows(s){
+  const t=INSAR&&INSAR.trang_thai==='ok'&&(INSAR.tram||{})[s.id]; if(!t) return '';
+  return '<table><tr><td colspan="2"><b>Dịch chuyển InSAR (300 m quanh điểm)</b></td></tr>'+
+    '<tr><td>Tốc độ trung vị</td><td>'+insarTxt(t.v_tv)+' ('+t.n+' điểm ảnh)</td></tr>'+
+    '<tr><td>Lớn nhất / phân vị 90%</td><td><b>'+insarTxt(t.v_max)+'</b> / '+fmtVN(t.p90,0)+' mm/năm</td></tr>'+
+    (t.v_doc!=null?'<tr><td>Quy theo hướng dốc</td><td>'+insarTxt(t.v_doc)+'</td></tr>':'')+
+    (t.v90_max!=null?'<tr><td>90 ngày gần nhất</td><td>'+insarTxt(t.v90_max)+'</td></tr>':'')+'</table>';
 }
 /* ---------- Dự báo tổ hợp (như EFAS/LHASA): 82 kịch bản ECMWF IFS + GFS ---------- */
 const ENS_MODELS = 'ecmwf_ifs025,gfs025';
@@ -595,7 +646,7 @@ function renderMap(){
               '<tr><td>Lực hút dính</td><td>'+(d.fs.psi>0?fmtVN(d.fs.psi,0)+' kPa':'đã mất (đất ngấm nước)')+'</td></tr>'+
               '<tr><td>Độ dốc mái</td><td>'+fmtVN(s.od.beta,0)+'° ('+s.od.nguon+')</td></tr>'+
               (d.fsEns?'<tr><td>Xác suất FS &lt; 1</td><td><b>'+Math.round(d.fsEns.p1*100)+'%</b>; FS 10–50–90%: '+fmtVN(d.fsEns.FS10,2)+' – '+fmtVN(d.fsEns.FS50,2)+' – '+fmtVN(d.fsEns.FS90,2)+'</td></tr>':'')+
-              '</table>'+fsSvg(s.fsChart,DAY):'')+
+              '</table>'+fsSvg(s.fsChart,DAY):'')+insarRows(s)+
        (d.byEns?'<br><b>Mức nâng theo dự báo tổ hợp.</b>':'')+
        (d.byFs?'<br><b>Mức nâng theo hệ số an toàn mái dốc.</b>':'')+
        (d.persist?'<br><b>'+persistTxt(d)+'</b>'+(d.byPersist?' – giữ mức Nguy hiểm tới hết '+PERSIST_DAYS+' ngày.':''):'')+
@@ -741,7 +792,7 @@ async function run(){
   const btn=document.getElementById('btn-refresh'); btn.disabled=true; btn.textContent='Đang cập nhật…';
   if(!loadRoad.done){ loadRoad.done=true; await loadRoad(); }
   await loadServer(); renderFSMethod();
-  await loadSat();
+  await loadSat(); loadInsar();
   try{
     RESULT=await fetchForecast(); setDay(DAY);
     if(REPLAY){ renderStatus(); showEvents(); }
