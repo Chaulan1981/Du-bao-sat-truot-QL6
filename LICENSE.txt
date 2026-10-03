@@ -1,0 +1,45 @@
+BẢN QUYỀN VÀ ĐIỀU KHOẢN SỬ DỤNG
+Hệ thống dự báo, cảnh báo sạt lở Quốc lộ 6
+
+Bản quyền © 2026 PGS. TS. Nguyễn Châu Lân, Trường Đại học Giao thông vận tải.
+Bảo lưu mọi quyền.
+
+Toàn bộ mã nguồn, thuật toán, mô hình, cơ sở dữ liệu đã xử lý, tài liệu, hình ảnh và
+giao diện trong kho này (gọi chung là "Sản phẩm") thuộc quyền tác giả của
+PGS. TS. Nguyễn Châu Lân, Trường Đại học Giao thông vận tải, và được bảo hộ theo
+Luật Sở hữu trí tuệ Việt Nam và các điều ước quốc tế mà Việt Nam là thành viên.
+
+Khi chưa có sự đồng ý bằng văn bản của tác giả, không ai được:
+  1. Sao chép, tải về để sử dụng lại, sửa đổi, chuyển thể toàn bộ hoặc một phần Sản phẩm;
+  2. Phân phối, đăng tải lại, cho thuê, bán hoặc dùng Sản phẩm vào mục đích thương mại;
+  3. Dùng Sản phẩm, hoặc tác phẩm phái sinh từ Sản phẩm, trong đề tài, dự án, hồ sơ dự thầu,
+     bài báo, luận văn, luận án mà không ghi nguồn và không được tác giả chấp thuận.
+
+Được phép (không cần xin phép):
+  - Xem trang web cảnh báo và đọc thông tin cảnh báo cho mục đích cá nhân, phòng tránh thiên tai;
+  - Trích dẫn ngắn có ghi rõ nguồn:
+    "Nguyễn Châu Lân (2026). Hệ thống dự báo, cảnh báo sạt lở Quốc lộ 6.
+     Trường Đại học Giao thông vận tải."
+
+Dữ liệu và phần mềm của bên thứ ba được dùng trong Sản phẩm (Open-Meteo, ECMWF, NOAA GFS,
+JAXA GSMaP, NASA GPM IMERG, Copernicus Sentinel, Google Earth Engine, OpenStreetMap, GRIP4,
+Leaflet...) vẫn tuân theo giấy phép riêng của từng bên.
+
+Sản phẩm là công cụ nghiên cứu, cung cấp "nguyên trạng", không phải kênh cảnh báo chính thức
+và không thay thế cấp độ rủi ro thiên tai theo Quyết định 18/2021/QĐ-TTg. Tác giả không chịu
+trách nhiệm về thiệt hại phát sinh từ việc sử dụng Sản phẩm.
+
+Mọi đề nghị sử dụng, hợp tác xin liên hệ tác giả qua Khoa Công trình,
+Trường Đại học Giao thông vận tải.
+
+-------------------------------------------------------------------------------
+COPYRIGHT AND TERMS OF USE
+Copyright © 2026 Assoc. Prof. Dr. Nguyen Chau Lan, University of Transport and
+Communications (UTC), Hanoi, Vietnam. All rights reserved.
+
+No part of this software, its algorithms, processed data, documents, images or user
+interface may be copied, modified, redistributed, sublicensed, sold or used in other
+projects, publications or commercial products without prior written permission of the
+author. Viewing the public warning website and short quotations with attribution are
+permitted. Third-party data and libraries remain under their own licenses.
+THE PRODUCT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.

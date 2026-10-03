@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<!-- Bản quyền © 2026 PGS. TS. Nguyễn Châu Lân, Trường Đại học Giao thông vận tải. Bảo lưu mọi quyền – xem LICENSE. -->
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dự báo sạt lở QL6 – cảnh báo tự động</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1D2A30">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --stone:#E6E9E7; --panel:#F4F5F3; --ink:#1D2A30; --muted:#5B6A70; --line:#C9CFCC;
+  --ochre:#A8651F;
+  --l0:#1E7B46; --l1:#E3B505; --l2:#B5560C; --l3:#C8322B;   /* chữ trắng đạt WCAG AA (>= 4.5:1) */
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--stone);
+  font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:380px 1fr;height:100%;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#map{height:100%;min-height:300px}
+aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+.head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.head h1{font-size:19px;line-height:1.2;margin:0 0 4px;font-weight:700}
+.head p{margin:0;color:var(--muted);font-size:13px}
+.status{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:var(--r);
+  background:#fff;border:1px solid var(--line)}
+.status .dot{width:14px;height:14px;border-radius:50%;flex:none;background:var(--muted)}
+.status b{font-size:16px}
+.status small{display:block;color:var(--muted);font-size:12px}
+section{padding:14px 18px;border-bottom:1px solid var(--line)}
+section h2{font-size:14px;margin:0 0 10px;font-weight:600}
+/* dai du bao 4 ngay - diem nhan chinh */
+.strip{display:grid;grid-template-columns:72px repeat(4,1fr);gap:4px;align-items:stretch}
+.strip .hd{font-size:12px;color:var(--muted);text-align:center;padding-bottom:2px}
+.strip .zn{font-size:12.5px;font-weight:600;display:flex;flex-direction:column;justify-content:center}
+.strip .zn span{font-weight:400;color:var(--muted);font-size:11px}
+.cellx{border-radius:7px;min-height:52px;text-align:center;line-height:1.2;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;font-weight:600;font-size:13px;cursor:pointer;border:2px solid transparent}
+.cellx small{font-weight:500;font-size:11px;opacity:.95}
+.cellx.sel{border-color:var(--ink)}
+.cellx.lv1{color:#3a2f00}
+.days{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.days button{font:inherit;font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;color:var(--ink);cursor:pointer}
+.days button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button:focus-visible,.cellx:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+.alerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.alerts li{background:#fff;border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;
+  padding:8px 10px;cursor:pointer}
+.alerts li b{display:block;font-size:13.5px}
+.alerts li span{color:var(--muted);font-size:12.5px}
+.empty{color:var(--muted);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tools button{font:inherit;font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid var(--ochre);
+  background:#fff;color:var(--ochre);cursor:pointer;font-weight:600}
+.tools button.primary{background:var(--ochre);color:#fff}
+.note{font-size:12px;color:var(--muted);margin:8px 0 0}
+.replay{margin-top:14px}.replay label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+.replay input{font:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+body.xem-lai aside{background:#FBF4E6}body.xem-lai .status{border-color:var(--ochre);border-width:2px}
+.ev{background:#fff;border-left:4px solid var(--ochre);border-radius:6px;padding:6px 8px;margin-top:6px;color:var(--ink)}
+.leaflet-popup-content{font-family:"Be Vietnam Pro",sans-serif;font-size:13px;line-height:1.45}
+.pop b{font-size:14px}
+.pop table{border-collapse:collapse;margin-top:4px}
+.pop td{padding:1px 8px 1px 0}
+.hs{width:12px;height:12px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.hs.s1{background:#6B3FA0;transform:rotate(45deg)} .hs.s2{background:#0E7C7B;border-radius:2px}
+.sat-zone{display:grid;grid-template-columns:72px 1fr;gap:2px 8px;font-size:12.5px;margin:6px 0}
+.sat-zone b{font-size:12.5px}.sat-zone span{color:var(--muted)}
+.guide{display:grid;gap:8px}
+.guide .who{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.guide .who b{display:block;font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:2px}
+.guide .lvl{display:flex;align-items:center;gap:8px;font-weight:600}
+.guide .lvl i{width:14px;height:14px;border-radius:3px;display:inline-block}
+details.levels summary{cursor:pointer;font-size:12.5px;color:var(--ochre);font-weight:600;margin-top:6px}
+details.levels table{border-collapse:collapse;font-size:12px;margin-top:6px}
+details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-align:top}
+.dl{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:13px}
+.dl a{color:var(--ochre);font-weight:600}
+.dl span{color:var(--muted);font-size:12px}
+.pb{height:5px;border-radius:3px;background:rgba(255,255,255,.35);width:80%;margin-top:3px;overflow:hidden}
+.pb i{display:block;height:100%;background:#fff}
+.cellx.lv1 .pb{background:rgba(58,47,0,.2)} .cellx.lv1 .pb i{background:#3a2f00}
+.loc-btn{background:#fff;border:2px solid rgba(0,0,0,.2);border-radius:4px;width:34px;height:34px;font-size:18px;cursor:pointer;line-height:1}
+.tri{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid #E07B16;
+  filter:drop-shadow(0 0 1px #fff)}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;grid-template-rows:40% 60%}
+  aside{order:2;border-right:0;border-top:1px solid var(--line)}
+  #map{order:1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="head">
+    <h1>Dự báo sạt lở Quốc lộ 6</h1>
+    <p>Mưa dự báo 4 ngày (dự báo chính và 82 kịch bản tổ hợp ECMWF, GFS) cộng mưa đo bằng vệ tinh, so với ngưỡng gây trượt Mai Châu và tính hệ số an toàn mái dốc theo nước ngấm và lực hút dính của đất (SWCC). Tự cập nhật 30 phút một lần.</p>
+    <div class="status" id="status" aria-live="polite">
+      <span class="dot" id="st-dot"></span>
+      <div><b id="st-txt">Đang tải dự báo…</b><small id="st-sub">Lấy số liệu mưa từ Open-Meteo</small></div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Mức cảnh báo theo khu vực và ngày</h2>
+    <div class="strip" id="strip" role="grid" aria-label="Mức cảnh báo 4 ngày cho 3 khu vực"></div>
+    <p class="note">Số nhỏ và thanh trắng trong ô: xác suất đạt ngưỡng trượt theo 82 kịch bản tổ hợp (cao nhất trong khu vực); khi không có tổ hợp thì là tỷ số mưa/ngưỡng. Chạm vào ô để xem ngày đó.</p>
+  </section>
+
+  <section id="fs-sec">
+    <h2>Ổn định mái dốc theo mưa và lực hút dính (SWCC)</h2>
+    <div class="strip" id="fs-strip" role="grid" aria-label="Hệ số an toàn mái dốc nhỏ nhất 4 ngày cho 3 khu vực"></div>
+    <p class="note">Số lớn: hệ số an toàn FS nhỏ nhất trong khu vực (FS &lt; 1 mất ổn định, &lt; 1,2 nguy hiểm). Số nhỏ: tỷ lệ kịch bản tổ hợp có FS &lt; 1.
+      Bấm vào điểm trên bản đồ để xem diễn biến FS 14 ngày qua và 4 ngày tới.</p>
+    <p class="note" id="fs-time"></p>
+    <details class="levels"><summary>Phương pháp</summary><div id="fs-method" class="note"></div></details>
+  </section>
+
+  <section>
+    <h2>Cảnh báo <span id="al-day">hôm nay</span></h2>
+    <div class="days" id="days"></div>
+    <ul class="alerts" id="alerts"></ul>
+  </section>
+
+  <section id="guide-sec">
+    <h2>Khuyến cáo hành động <span id="g-day">hôm nay</span></h2>
+    <div class="guide" id="guide"></div>
+    <details class="levels"><summary>Xem khuyến cáo của cả 4 mức</summary><table id="guide-all"></table></details>
+  </section>
+
+  <section id="sat-sec">
+    <h2>Theo dõi bằng vệ tinh</h2>
+    <div id="sat-box"><p class="note" style="margin-top:0">Đang tải số liệu vệ tinh…</p></div>
+  </section>
+
+  <section>
+    <h2>Chú giải</h2>
+    <div class="legend">
+      <span><i style="background:var(--l0)"></i>An toàn</span>
+      <span><i style="background:var(--l1)"></i>Cần chú ý</span>
+      <span><i style="background:var(--l2)"></i>Nguy hiểm</span>
+      <span><i style="background:var(--l3)"></i>Đạt ngưỡng trượt</span>
+      <span><i style="background:var(--ochre);border-radius:2px"></i>Điểm trượt đã ghi nhận</span>
+      <span><i style="background:#6B3FA0;border-radius:1px;transform:rotate(45deg)"></i>Thay đổi trên ảnh radar Sentinel-1</span>
+      <span><i style="background:#0E7C7B;border-radius:1px"></i>Mất lớp phủ trên ảnh Sentinel-2</span>
+    </div>
+    <p class="note">Ngưỡng Mai Châu: P = 128,41 − 0,076·P₁₀ (P mưa ngày, P₁₀ mưa 10 ngày trước; Mai Thành Tân, 2015).
+      Sau ngày mưa vượt ngưỡng, điểm đó giữ mức Nguy hiểm thêm 7 ngày vì nhiều vụ sạt xảy ra muộn sau mưa.
+      Mái đá như Km124+300 có thể đổ lở cả khi không mưa nên luôn ở mức cần chú ý.</p>
+    <p class="note">Hệ số an toàn mái dốc FS tính theo nước mưa ngấm dần vào đất và lực hút dính mất đi khi đất ướt (SWCC):
+      FS &lt; 1,2 nâng lên Nguy hiểm, FS &lt; 1 lên Đạt ngưỡng trượt. Cách này bắt được cả đợt mưa kéo dài nhiều ngày mà từng ngày đều dưới ngưỡng.</p>
+  </section>
+
+  <section>
+    <h2>Độ tin cậy của cảnh báo</h2>
+    <p class="note" style="margin-top:0">Kiểm định với các vụ sạt QL6 đã xác minh 2023–2026 có số đo mưa: bắt đúng 5/6 vụ (3/6 nếu không duy trì 7 ngày).</p>
+    <ul class="alerts" style="margin-top:8px">
+      <li style="border-left-color:#2E9E5B;cursor:default"><b>Bắt đúng</b><span>Bão Yagi 7–9/9/2024 (Hòa Bình) · Huổi Lóng 8–9/7/2026 · Chiềng Pấc 5/8/2026</span></li>
+      <li style="border-left-color:#2E9E5B;cursor:default"><b>Bắt đúng nhờ duy trì 7 ngày</b><span>Km121+700 ngày 31/8/2025 (5 ngày sau mưa 270 mm) · Huổi Lóng sạt lại 16/7/2026</span></li>
+      <li style="border-left-color:#C8322B;cursor:default"><b>Bỏ sót</b><span>Km124+300 ngày 14/12/2025: đổ lở đá mùa khô, mưa chỉ 5 mm</span></li>
+    </ul>
+    <p class="note">Mẫu còn nhỏ (6 vụ) nên đây là tín hiệu ban đầu, chưa phải tỷ lệ chính thức.
+      Dự báo tổ hợp được thêm từ 03/10/2026; mức cảnh báo mỗi ngày được lưu vào <a href="data/luu_tru/canhbao_lich_su.csv">file lịch sử</a>
+      để tính tỷ lệ bắt đúng (POD) và báo nhầm (FAR) khi có thêm sự cố được xác minh.</p>
+  </section>
+
+  <section>
+    <h2>Dữ liệu mở và chuẩn quốc tế</h2>
+    <ul class="dl">
+      <li><a href="data/cap/index.atom">Tin cảnh báo CAP 1.2 (Atom)</a> <span>chuẩn OASIS/ITU-T X.1303, mỗi khu vực một tin:
+        <a href="data/cap/KV1.xml">KV1</a> · <a href="data/cap/KV2.xml">KV2</a> · <a href="data/cap/KV3.xml">KV3</a></span></li>
+      <li><a href="data/canhbao.geojson" download>Mức cảnh báo dạng GeoJSON</a> <span>mở bằng QGIS, ArcGIS, Google Earth</span></li>
+      <li><a href="data/luu_tru/canhbao_lich_su.csv" download>Lịch sử cảnh báo hằng ngày (CSV)</a> <span>để tính tỷ lệ bắt đúng, báo nhầm</span></li>
+      <li><a href="data/vetinh.json">Kết quả vệ tinh (JSON)</a> <span>mưa GSMaP/IMERG, thay đổi Sentinel-1/2</span></li>
+    </ul>
+    <p class="note">Nguồn: dự báo Open-Meteo (CC BY 4.0) gồm ECMWF IFS và NOAA GFS; mưa vệ tinh JAXA GSMaP, NASA GPM IMERG;
+      ảnh Copernicus Sentinel-1/2 qua Google Earth Engine; đường GRIP4 và © OpenStreetMap. Mã nguồn hệ thống không công khai;
+      đề nghị sử dụng dữ liệu, hợp tác xin liên hệ tác giả.</p>
+    <p class="note">Mức cảnh báo ở đây phục vụ nghiên cứu, không thay thế cấp độ rủi ro thiên tai chính thức theo Quyết định 18/2021/QĐ-TTg.</p>
+  </section>
+
+  <section>
+    <div class="tools">
+      <button class="primary" id="btn-refresh" type="button">Cập nhật ngay</button>
+    </div>
+    <div class="replay">
+      <label for="replay-date">Xem lại một ngày trong quá khứ</label>
+      <div class="tools"><input type="date" id="replay-date" min="2022-01-01">
+        <button type="button" id="btn-replay">Xem ngày này</button>
+        <button type="button" id="btn-live" hidden>Về dự báo hiện tại</button></div>
+      <div id="ev-box" class="note"></div>
+      <button id="btn-notify" type="button">Bật thông báo trên máy này</button>
+    </div>
+    <p class="note" id="auto-note"></p>
+    <p class="note">Công cụ nghiên cứu của Trường ĐH Giao thông vận tải, không phải kênh cảnh báo chính thức của cơ quan nhà nước. <a href="chinh-sach-rieng-tu.html">Chính sách quyền riêng tư</a></p>
+    <p class="note">© 2026 PGS. TS. Nguyễn Châu Lân, Trường Đại học Giao thông vận tải. Bảo lưu mọi quyền.
+      Không sao chép, sử dụng lại mã nguồn, thuật toán, dữ liệu khi chưa được tác giả đồng ý bằng văn bản. <a href="LICENSE.txt">Điều khoản</a></p>
+  </section>
+</aside>
+<div id="map" role="region" aria-label="Bản đồ cảnh báo"></div>
+</div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+const DATA = {"route":[[105.8301,21.019],[105.8224,21.0057],[105.8032,20.9908],[105.7808,20.9746],[105.7632,20.9611],[105.7574,20.9566],[105.7375,20.9419],[105.729,20.9376],[105.7202,20.9327],[105.7082,20.9249],[105.6919,20.9242],[105.6876,20.9269],[105.6826,20.9289],[105.6726,20.9287],[105.6645,20.9286],[105.6569,20.9274],[105.6523,20.9254],[105.6477,20.9225],[105.6411,20.9174],[105.6363,20.9145],[105.6243,20.9138],[105.6155,20.9122],[105.6011,20.9081],[105.5906,20.9051],[105.5841,20.9032],[105.5762,20.8982],[105.5696,20.8915],[105.5649,20.8863],[105.5562,20.8839],[105.551,20.883],[105.5453,20.8798],[105.5395,20.8761],[105.5345,20.8725],[105.524,20.8709],[105.5192,20.8704],[105.5117,20.871],[105.5045,20.8719],[105.5001,20.8754],[105.4962,20.8818],[105.4947,20.8871],[105.4943,20.8925],[105.4888,20.8972],[105.4803,20.9025],[105.4747,20.905],[105.4676,20.9034],[105.4629,20.9072],[105.4594,20.9116],[105.4567,20.9167],[105.4495,20.9158],[105.4432,20.9163],[105.4366,20.9158],[105.4306,20.9148],[105.4244,20.916],[105.4196,20.9153],[105.4178,20.9108],[105.4067,20.9073],[105.4001,20.9043],[105.3938,20.9031],[105.3888,20.8994],[105.3818,20.894],[105.3766,20.891],[105.3719,20.8892],[105.3543,20.8868],[105.3473,20.8816],[105.3479,20.8636],[105.3495,20.8585],[105.3531,20.8511],[105.3566,20.8471],[105.36,20.8412],[105.3604,20.8337],[105.3585,20.8242],[105.3594,20.8107],[105.3589,20.8055],[105.357,20.7963],[105.3557,20.7901],[105.3389,20.7808],[105.3333,20.7781],[105.3275,20.7692],[105.3337,20.7606],[105.3313,20.7565],[105.3335,20.7482],[105.3295,20.7444],[105.3242,20.7403],[105.3231,20.7358],[105.3231,20.7292],[105.3232,20.7207],[105.3248,20.7158],[105.3261,20.7106],[105.3223,20.706],[105.3186,20.702],[105.3143,20.6983],[105.3147,20.6925],[105.3123,20.6838],[105.3106,20.6784],[105.3088,20.6739],[105.3025,20.6719],[105.2982,20.6692],[105.2969,20.6647],[105.2888,20.6571],[105.2858,20.6534],[105.2843,20.6487],[105.2845,20.6437],[105.2821,20.6396],[105.2777,20.6362],[105.2782,20.6294],[105.2774,20.6248],[105.2689,20.6164],[105.264,20.6163],[105.2484,20.6188],[105.228,20.6242],[105.2238,20.6281],[105.2146,20.6386],[105.2039,20.6382],[105.1986,20.6366],[105.1924,20.635],[105.1873,20.6327],[105.1818,20.6344],[105.1767,20.6379],[105.1724,20.6423],[105.162,20.6482],[105.1564,20.6505],[105.1468,20.655],[105.1291,20.667],[105.1092,20.6739],[105.1002,20.6781],[105.091,20.6802],[105.0841,20.6815],[105.0804,20.6913],[105.0791,20.6989],[105.075,20.7019],[105.069,20.7067],[105.0571,20.7192],[105.053,20.7149],[105.0485,20.7131],[105.042,20.7121],[105.0355,20.7111],[105.03,20.7114],[105.0064,20.7192],[105,20.7195],[104.9794,20.7148],[104.9744,20.7158],[104.9589,20.7279],[104.9501,20.73],[104.9434,20.7347],[104.9359,20.7398],[104.9287,20.7445],[104.9238,20.7487],[104.9177,20.7513],[104.9121,20.7526],[104.9002,20.7628],[104.8948,20.7682],[104.8836,20.7716],[104.8659,20.7726],[104.8317,20.7829],[104.8261,20.7836],[104.8122,20.7819],[104.8066,20.782],[104.7971,20.7836],[104.792,20.783],[104.78,20.7784],[104.7755,20.7767],[104.756,20.7808],[104.7285,20.7868],[104.72,20.7886],[104.7155,20.7907],[104.7017,20.8054],[104.6976,20.8081],[104.6961,20.8138],[104.6922,20.8179],[104.6856,20.8206],[104.682,20.8238],[104.6793,20.8279],[104.6678,20.835],[104.6642,20.8384],[104.6592,20.8469],[104.6414,20.8464],[104.6374,20.8497],[104.6182,20.8547],[104.6009,20.8616],[104.5937,20.8665],[104.5915,20.8729],[104.5901,20.8778],[104.5688,20.8942],[104.5566,20.8958],[104.5332,20.8989],[104.5167,20.9006],[104.5052,20.9045],[104.4918,20.9122],[104.4794,20.9253],[104.4668,20.9363],[104.4411,20.9565],[104.4293,20.9642],[104.4194,20.9705],[104.4149,20.977],[104.4124,20.986],[104.4107,20.9908],[104.4078,20.9976],[104.4027,21.0048],[104.3957,21.0107],[104.3861,21.0167],[104.3737,21.0268],[104.3657,21.0306],[104.3603,21.0312],[104.3547,21.0338],[104.3505,21.0392],[104.3463,21.0428],[104.3408,21.0436],[104.3327,21.0455],[104.3235,21.0467],[104.3166,21.0506],[104.3106,21.0513],[104.3053,21.0493],[104.2992,21.0461],[104.29,21.0504],[104.2831,21.0512],[104.2755,21.0515],[104.2698,21.0551],[104.2576,21.0628],[104.2507,21.0661],[104.2478,21.0713],[104.243,21.0736],[104.2383,21.0791],[104.2379,21.0868],[104.2402,21.0921],[104.2373,21.099],[104.2315,21.1062],[104.2207,21.1139],[104.2164,21.1187],[104.2115,21.1208],[104.2086,21.1251],[104.2072,21.1306],[104.2064,21.1351],[104.201,21.1381],[104.1952,21.1389],[104.1903,21.1371],[104.1847,21.1359],[104.1794,21.1339],[104.1691,21.1306],[104.1632,21.1295],[104.1537,21.1368],[104.1472,21.1424],[104.1338,21.1595],[104.1313,21.1637],[104.1302,21.1689],[104.1281,21.1733],[104.1217,21.1798],[104.1091,21.1925],[104.1063,21.1966],[104.0983,21.203],[104.093,21.2052],[104.091,21.201],[104.0849,21.1993],[104.0792,21.1984],[104.0739,21.201],[104.0687,21.2027],[104.0563,21.204],[104.0515,21.2062],[104.0451,21.2121],[104.0297,21.2223],[104.0208,21.229],[104.0171,21.2329],[104.008,21.2459],[104.0006,21.2511],[103.9946,21.2615],[103.9912,21.2657],[103.9827,21.2731],[103.9758,21.2791],[103.9648,21.2888],[103.9397,21.3016],[103.9321,21.3054],[103.9281,21.3084],[103.9144,21.3269],[103.9075,21.3313],[103.9026,21.3323],[103.8964,21.3316],[103.8906,21.3315],[103.8866,21.3284],[103.8817,21.3258],[103.8749,21.3276],[103.8709,21.3302],[103.87,21.3417],[103.8655,21.351],[103.8538,21.352],[103.8325,21.3549],[103.825,21.3536],[103.8194,21.3526],[103.8144,21.3529],[103.8037,21.3603],[103.783,21.3744],[103.7788,21.3779],[103.7744,21.3888],[103.7601,21.4264],[103.7295,21.425],[103.7209,21.4246],[103.7145,21.4258],[103.6896,21.4362],[103.6702,21.4646],[103.6675,21.4703],[103.6547,21.5054],[103.652,21.51],[103.6409,21.5217],[103.6361,21.5267],[103.6347,21.5321],[103.629,21.5379],[103.619,21.5378],[103.6137,21.5364],[103.6026,21.5304],[103.5988,21.5336],[103.5887,21.5379],[103.5844,21.5403],[103.5808,21.545],[103.5765,21.5481],[103.5713,21.5499],[103.5651,21.5477],[103.5556,21.5518],[103.5396,21.5635],[103.5289,21.5671],[103.5161,21.562],[103.5041,21.5626],[103.4959,21.5652],[103.4877,21.5696],[103.4826,21.5696],[103.475,21.5669],[103.4665,21.5661],[103.4543,21.566],[103.443,21.5656],[103.4367,21.5661],[103.4305,21.5689],[103.4262,21.5756],[103.4221,21.5845],[103.421,21.5891],[103.4275,21.5965],[103.4299,21.6012],[103.4343,21.6176],[103.436,21.6221],[103.4418,21.6317],[103.4432,21.6362],[103.4439,21.65],[103.4362,21.6568],[103.4311,21.6595],[103.4254,21.6665],[103.4225,21.6727],[103.4197,21.6803],[103.412,21.6849],[103.4066,21.6891],[103.4036,21.6964],[103.4038,21.702],[103.3999,21.7118],[103.3954,21.7214],[103.3925,21.7291],[103.3927,21.7374],[103.3888,21.7428],[103.3839,21.7493],[103.382,21.7535],[103.3721,21.7514],[103.365,21.7502],[103.3589,21.7482],[103.35,21.7369],[103.3371,21.7526],[103.3321,21.7587],[103.3297,21.7634],[103.3281,21.7746],[103.3263,21.7796],[103.3219,21.7872],[103.3185,21.7914],[103.3024,21.8046],[103.302,21.8153],[103.3002,21.8201],[103.2969,21.824],[103.2956,21.8285],[103.2954,21.8333],[103.2939,21.8379],[103.2879,21.849],[103.2868,21.8536],[103.2873,21.8636],[103.2862,21.8687],[103.2826,21.8759],[103.2799,21.8816],[103.2765,21.8851],[103.2717,21.8863],[103.2708,21.8932],[103.2684,21.898],[103.2575,21.9033],[103.2538,21.9115],[103.241,21.923],[103.2323,21.9394],[103.2261,21.9474],[103.2222,21.9509],[103.2147,21.9518],[103.2097,21.956],[103.2044,21.9545],[103.2011,21.9495],[103.1955,21.9477],[103.191,21.951],[103.1882,21.9559],[103.1843,21.9587],[103.1787,21.9624],[103.1745,21.9725],[103.1738,21.9774],[103.1724,21.9865],[103.1723,21.9937],[103.1697,21.9988],[103.1684,22.0042],[103.1689,22.0089],[103.165,22.0153],[103.1642,22.0214],[103.1648,22.0348],[103.1637,22.0499]],"zones":[{"id":"KV1","tinh":"Phú Thọ","km0":116,"km1":140,"note":"Đèo Đá Trắng – Thung Khe · Km118–128 · Đồng Bảng Km138","line":[[105.15808,20.64987],[105.15643,20.65055],[105.14679,20.65505],[105.12909,20.66702],[105.10917,20.67393],[105.10021,20.67812],[105.09103,20.68015],[105.08415,20.6815],[105.08045,20.69125],[105.07907,20.69888],[105.07499,20.70194],[105.06903,20.70666],[105.05707,20.71924],[105.05301,20.71491],[105.04851,20.71309],[105.042,20.71214],[105.03549,20.71114],[105.02998,20.7114],[105.00641,20.71917],[104.99997,20.71948],[104.99977,20.71943]]},{"id":"KV2","tinh":"Sơn La","km0":330,"km1":345,"note":"Thuận Châu – chân đèo Pha Đin","line":[[103.65242,21.50924],[103.65199,21.50999],[103.64087,21.52166],[103.63607,21.52666],[103.63471,21.53208],[103.62897,21.53792],[103.61901,21.53781],[103.61371,21.53644],[103.60259,21.53041],[103.59877,21.53363],[103.58873,21.53788],[103.58435,21.54034],[103.58079,21.54499],[103.57655,21.5481],[103.57126,21.54994],[103.56507,21.54766],[103.56294,21.54859]]},{"id":"KV3","tinh":"Điện Biên","km0":405,"km1":416,"note":"Đèo Huổi Lóng","line":[[103.34053,21.74848],[103.33711,21.75265],[103.3321,21.75871],[103.32972,21.76344],[103.32807,21.77457],[103.32629,21.77962],[103.32193,21.78716],[103.31851,21.79138],[103.30236,21.80463],[103.30234,21.80524]]}],"stations":[{"id":"KV1-Km116","zone":"KV1","km":116,"xy":[105.15808,20.64987],"type":"tuyen"},{"id":"KV1-Km119","zone":"KV1","km":119,"xy":[105.13973,20.65982],"type":"tuyen"},{"id":"KV1-Km122","zone":"KV1","km":122,"xy":[105.11942,20.67038],"type":"tuyen"},{"id":"KV1-Km125","zone":"KV1","km":125,"xy":[105.09741,20.67874],"type":"tuyen"},{"id":"KV1-Km128","zone":"KV1","km":128,"xy":[105.08038,20.69164],"type":"tuyen"},{"id":"KV1-Km131","zone":"KV1","km":131,"xy":[105.06625,20.70959],"type":"tuyen"},{"id":"KV1-Km134","zone":"KV1","km":134,"xy":[105.04831,20.71306],"type":"tuyen"},{"id":"KV1-Km137","zone":"KV1","km":137,"xy":[105.02378,20.71344],"type":"tuyen"},{"id":"KV1-Km140","zone":"KV1","km":140,"xy":[104.99977,20.71943],"type":"tuyen"},{"id":"KV2-Km330","zone":"KV2","km":330,"xy":[103.65242,21.50924],"type":"tuyen"},{"id":"KV2-Km333","zone":"KV2","km":333,"xy":[103.6373,21.52538],"type":"tuyen"},{"id":"KV2-Km336","zone":"KV2","km":336,"xy":[103.62227,21.53785],"type":"tuyen"},{"id":"KV2-Km339","zone":"KV2","km":339,"xy":[103.60155,21.53129],"type":"tuyen"},{"id":"KV2-Km342","zone":"KV2","km":342,"xy":[103.58252,21.54273],"type":"tuyen"},{"id":"KV2-Km345","zone":"KV2","km":345,"xy":[103.56294,21.54859],"type":"tuyen"},{"id":"KV3-Km405","zone":"KV3","km":405,"xy":[103.34053,21.74848],"type":"tuyen"},{"id":"KV3-Km408","zone":"KV3","km":408,"xy":[103.32961,21.76417],"type":"tuyen"},{"id":"KV3-Km411","zone":"KV3","km":411,"xy":[103.32474,21.7823],"type":"tuyen"},{"id":"KV3-Km414","zone":"KV3","km":414,"xy":[103.31201,21.79671],"type":"tuyen"},{"zone":"KV1","type":"da","id":"Km118+700 Đá Trắng (đá rơi 17/5/2026)","km":118.7,"xy":[105.14274,20.66],"note":"Đá vôi hoa hóa – mái đua treo, RHRS 486"},{"zone":"KV1","type":"da","id":"Km123+600 (trượt theo lớp)","km":123.6,"xy":[105.10618,20.67272]},{"zone":"KV1","type":"da","id":"Km124+300 (khối trượt 14/12/2025)","km":124.3,"xy":[105.1033,20.6777],"note":"Đổ lở đá vôi – kiểm soát cấu trúc"}],"official":[{"ten":"Km118+660÷783","km":118.7,"xy":[105.14163,20.65854]},{"ten":"Km120+765÷850","km":120.8,"xy":[105.12821,20.66732]},{"ten":"Km127+963÷128+219","km":128.1,"xy":[105.08024,20.69241]},{"ten":"Km128+672÷864","km":128.8,"xy":[105.07926,20.69781]},{"ten":"Km138+437÷583","km":138.5,"xy":[105.01196,20.71734]}],"landslides":[[103.3955,21.579],[103.4081,21.5909],[103.2587,21.8722],[103.2546,21.9037],[104.7411,20.7833],[104.785,20.7808],[104.7881,20.7807],[104.8977,20.7675],[104.9221,20.7508],[104.8116,20.7818],[104.4862,20.9153],[104.4867,20.9138],[104.4926,20.91],[104.5371,20.8981],[104.5464,20.8943],[104.5494,20.8937],[104.5545,20.8952],[104.5632,20.8952],[104.5643,20.8946],[104.5684,20.8945],[104.5767,20.8901],[104.5048,20.9048],[104.5275,20.8991],[104.5336,20.8987],[104.5425,20.8962],[104.5531,20.894],[104.5656,20.894],[104.5788,20.8879],[104.0901,21.2188],[104.0443,21.2214],[104.0916,21.2023],[104.1311,21.1577],[104.1102,21.1466],[104.0668,21.1743],[103.7002,21.4319],[103.7789,21.3774],[103.6356,21.5278],[105.3176,20.6452],[105.3582,20.8258],[105.3591,20.8059],[105.3577,20.8204],[105.3588,20.8319],[103.4124,21.7486],[103.3965,21.7375],[103.3015,21.8014],[103.4099,21.5855],[103.3988,21.5798],[103.2844,21.8758],[103.2911,21.7925],[103.29,21.7911],[103.3015,21.8014],[104.6766,20.8396],[104.8471,20.7989],[104.7873,20.8059],[104.4957,20.907],[104.5152,20.8967],[104.5259,20.8994],[104.5515,20.8937],[104.5601,20.8939],[104.5618,20.895],[104.5745,20.8913],[104.6017,20.8398],[104.5399,20.8977],[104.6005,20.842],[104.0331,21.2362],[104.0905,21.1845],[104.0919,21.2046],[104.1051,21.1613],[104.1292,21.1479],[104.1492,21.1182],[104.1275,21.1522],[103.7127,21.4135],[103.7275,21.4269],[103.8149,21.337],[103.9061,21.3092],[103.9067,21.3133],[103.5685,21.5531],[103.5698,21.5535],[103.6524,21.4911],[103.6702,21.5173],[103.6313,21.4872],[105.2485,20.6191],[104.8987,20.7291],[105.0763,20.6919],[105.0675,20.69],[105.028,20.7407],[105.0535,20.724],[105.3135,20.7433],[105.3513,20.7375],[105.3576,20.7384],[105.3336,20.7473],[105.3298,20.7449],[105.33,20.7143],[105.3725,20.8365],[105.3499,20.8358],[105.3322,20.7772],[105.3591,20.8396],[105.3802,20.8667],[105.3341,20.7806],[105.3609,20.8311],[105.314,20.6966],[105.3667,20.8321],[105.4985,20.8764],[105.3174,20.8784],[105.4739,20.9047],[105.3746,20.8702],[103.3018,21.8086],[103.3001,21.8112],[103.4093,21.7461],[103.4204,21.6801],[103.4055,21.7453],[103.4029,21.7419],[103.404,21.6889],[103.403,21.6985],[103.3909,21.746],[103.3826,21.7749],[103.3041,21.8044],[103.4217,21.685],[103.4184,21.6839],[103.4654,21.6497],[103.4119,21.6838],[103.3938,21.7439],[103.4704,21.6494],[103.3802,21.7745],[103.3592,21.7492],[103.4864,21.5874],[103.411,21.5629],[103.4703,21.6455],[103.4073,21.5663],[103.4195,21.5751],[103.4423,21.6455],[103.3018,21.8086],[103.3001,21.8112],[103.3041,21.8044],[103.3592,21.7492],[104.7049,20.8295],[104.7297,20.785],[104.7475,20.8082],[104.8792,20.7963],[104.8159,20.7836],[104.6249,20.8515],[104.5199,20.8958],[104.0912,21.1863],[104.0919,21.2033],[104.1024,21.1683],[104.1025,21.1683],[104.1119,21.1456],[104.1281,21.1527],[103.7723,21.3955],[103.6787,21.4243],[105.1726,20.6276],[105.5439,20.8974]]};
+const MC_A = 128.41, MC_B = 0.076;
+const LV_TXT = ['An toàn','Cần chú ý','Nguy hiểm','Đạt ngưỡng trượt'];
+const LV_SHORT = ['An toàn','Chú ý','Nguy hiểm','Vượt ngưỡng'];
+const LV_COL = ['#1E7B46','#E3B505','#B5560C','#C8322B'];
+let DAY_TXT = ['Hôm nay','Ngày mai','+2 ngày','+3 ngày'];
+let REPLAY = null;                       // 'YYYY-MM-DD' khi đang xem lại
+const EVENTS = [                          // sự cố QL6 đã xác minh (báo chí, Cục ĐBVN)
+  ['2024-09-08','Bão Yagi: >50 vị trí sụt taluy QL6 qua Hòa Bình'],['2025-08-31','Km121+700 Thung Khe: đá đổ chắn đường'],
+  ['2025-12-14','Km124+300 Thung Khe: sạt lở, 3 người tử vong (trời gần như không mưa)'],
+  ['2026-05-17','Km118+700 Đèo Đá Trắng: đá rơi trúng người đi xe máy'],
+  ['2026-05-24','Mưa 21–25/5: sạt taluy Km421+450, Km460+930 (Điện Biên)'],
+  ['2026-07-08','Đèo Huổi Lóng: cấm đường từ 10h30'],['2026-07-09','Mưa lớn 5–9/7: nhiều điểm sạt QL6 Km383–475 (Điện Biên)'],
+  ['2026-07-16','Đèo Huổi Lóng sạt lại, cấm đường từ 18h15'],['2026-08-05','Đèo Chiềng Pấc Km322–323 (Sơn La): sạt taluy, ô tô bị vùi']];
+function addDays(iso,n){const d=new Date(iso+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10);}
+const REFRESH_MIN = 30;
+const PERSIST_DAYS = 7;   // duy trì cảnh báo sau ngày mưa vượt ngưỡng (kiểm định 2023–2026)
+const PAST_DAYS = 17;     // 10 ngày tính P10 + 7 ngày duy trì
+let SV = null;            // kết quả tính trên máy chủ (data/alerts.json): hệ số an toàn mái dốc FS
+async function loadServer(){
+  try{ const r=await fetch('data/alerts.json',{cache:'no-store'}); SV=r.ok?await r.json():null; }catch(_){ SV=null; }
+}
+const FS_NG = [1.0, 1.2, 1.3];
+function fsMuc(f,ng){ ng=ng||FS_NG; return f<ng[0]?3:f<ng[1]?2:f<ng[2]?1:0; }
+let RESULT = null, DAY = 0, lastNotified = '';
+
+/* ---------- Bản đồ ---------- */
+const map = L.map('map',{zoomControl:true}).setView([20.95,104.4],8);
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
+const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {maxZoom:18,attribution:'Ảnh vệ tinh © Esri'});
+L.polyline(DATA.route.map(p=>[p[1],p[0]]),{color:'#5B6A70',weight:3,opacity:.8}).addTo(map);
+const zoneLayer = L.layerGroup().addTo(map);
+const stLayer = L.layerGroup().addTo(map);
+const lsLayer = L.layerGroup();
+DATA.landslides.forEach(p=>L.circleMarker([p[1],p[0]],{radius:3,color:'#A8651F',weight:1,fillOpacity:.8})
+  .bindTooltip('Điểm trượt đã điều tra').addTo(lsLayer));
+lsLayer.addTo(map);
+const offLayer = L.layerGroup().addTo(map);
+DATA.official.forEach(o=>L.marker([o.xy[1],o.xy[0]],{icon:L.divIcon({className:'',html:'<div class="tri"></div>',iconSize:[16,14],iconAnchor:[8,10]})})
+  .bindPopup('<div class="pop"><b>'+o.ten+'</b><br>Điểm nguy cơ cao (Cục Đường bộ, 17/12/2025)</div>').addTo(offLayer));
+const satLayer = L.layerGroup().addTo(map);
+const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  {maxZoom:17,attribution:'© OpenStreetMap, SRTM | Kiểu bản đồ © OpenTopoMap (CC BY-SA)'});
+L.control.scale({metric:true,imperial:false}).addTo(map);
+const LocCtl = L.Control.extend({options:{position:'topleft'},onAdd(){
+  const b=L.DomUtil.create('button','loc-btn'); b.type='button'; b.title='Vị trí của tôi'; b.setAttribute('aria-label','Vị trí của tôi'); b.textContent='◎';
+  L.DomEvent.disableClickPropagation(b); b.onclick=()=>map.locate({setView:true,maxZoom:14}); return b; }});
+map.addControl(new LocCtl());
+let locLayer=null;
+map.on('locationfound',e=>{ if(locLayer) map.removeLayer(locLayer);
+  let near='';
+  RESULT&&RESULT.forEach(s=>{const d=map.distance(e.latlng,[s.xy[1],s.xy[0]])/1000; if(!near||d<near.d) near={d,s};});
+  locLayer=L.layerGroup([L.circle(e.latlng,{radius:e.accuracy,weight:1,color:'#2563eb',fillOpacity:.1}),
+    L.circleMarker(e.latlng,{radius:7,color:'#fff',weight:2,fillColor:'#2563eb',fillOpacity:1})
+      .bindPopup('Vị trí của bạn'+(near?'<br>Điểm dự báo gần nhất: <b>'+near.s.id+'</b> ('+near.d.toFixed(1)+' km) – '+LV_TXT[near.s.days[DAY].lv]:''))]).addTo(map);
+  locLayer.getLayers()[1].openPopup();
+});
+map.on('locationerror',()=>alert('Không lấy được vị trí. Kiểm tra quyền truy cập vị trí của trình duyệt.'));
+let ROAD = {};                                   // tim đường thật GRIP4 theo khu vực (job vệ tinh xuất ra)
+async function loadRoad(){
+  try{ const r=await fetch('data/duong.geojson',{cache:'no-store'}); if(!r.ok) return;
+    const g=await r.json();
+    g.features.forEach(f=>{ const c=f.geometry.type==='LineString'?[f.geometry.coordinates]:
+      f.geometry.type==='MultiLineString'?f.geometry.coordinates:
+      (f.geometry.geometries||[]).flatMap(x=>x.type==='LineString'?[x.coordinates]:x.type==='MultiLineString'?x.coordinates:[]);
+      ROAD[f.properties.kv]=c; });
+  }catch(_){}
+}
+function zoneLines(z){ return ROAD[z.id] ? ROAD[z.id] : [z.line]; }
+function snapXY(s){                               // điểm dự báo trên tuyến -> điểm gần nhất trên tim đường thật
+  if(s.type==='da'||!ROAD[s.zone]) return s.xy; let best=null,bd=1e9;
+  ROAD[s.zone].forEach(l=>l.forEach(p=>{const d=(p[0]-s.xy[0])**2+(p[1]-s.xy[1])**2; if(d<bd){bd=d;best=p;}}));
+  return bd<(0.004**2)?best:s.xy;
+}
+L.control.layers({'Bản đồ nền':osm,'Địa hình':topo,'Ảnh vệ tinh':sat},
+  {'Điểm dự báo':stLayer,'Điểm trượt đã điều tra':lsLayer,'Điểm nguy cơ Cục ĐB':offLayer,'Thay đổi phát hiện từ vệ tinh':satLayer},{collapsed:true}).addTo(map);
+map.fitBounds(L.latLngBounds(DATA.zones.flatMap(z=>z.line.map(p=>[p[1],p[0]]))).pad(0.15));
+
+/* ---------- Tính cảnh báo ---------- */
+function levelOf(P,P10,isRock){
+  const thr = MC_A - MC_B*P10;
+  const ratio = P/Math.max(thr,1);
+  let lv = ratio>=1?3 : ratio>=0.9?2 : ratio>=0.7?1 : 0;
+  const lv24 = P>=200?3 : P>=100?2 : P>=50?1 : 0;     // cấp mưa ngày
+  lv = Math.max(lv,lv24);
+  if(isRock) lv = Math.max(lv,1);                      // mái đá: luôn cần chú ý
+  return {thr,ratio,lv};
+}
+// Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới)
+function evalStation(pr, times, isRock){
+  const sum=(a,b)=>pr.slice(a,b).reduce((x,y)=>x+y,0);
+  const exceed=t=>{ if(t<10) return false; const P=pr[t]; return P>20 && P/Math.max(MC_A-MC_B*sum(t-10,t),1)>=1; };
+  const days=[];
+  for(let k=0;k<4;k++){
+    const t=PAST_DAYS+k, P=pr[t], P10=sum(t-10,t);
+    const o=Object.assign({date:times[t],P,P10,persist:null},levelOf(P,P10,isRock));
+    for(let j=1;j<=PERSIST_DAYS;j++){
+      if(exceed(t-j)){ o.persist={days:j,date:times[t-j],P:pr[t-j]}; break; }
+    }
+    if(o.persist && o.lv<2){ o.lv=2; o.byPersist=true; }
+    days.push(o);
+  }
+  return days;
+}
+/* ---------- Vệ tinh (job GitHub Actions + Google Earth Engine) ---------- */
+let VT = null;
+async function loadSat(){
+  try{ const r=await fetch('data/vetinh.json',{cache:'no-store'}); if(r.ok) VT=await r.json(); }catch(_){}
+  renderSat();
+}
+function satAgeDays(){ if(!VT||!VT.updated) return 99; return (Date.now()-new Date(VT.updated.replace(' ','T')+':00+07:00'))/864e5; }
+function satRainFor(id){                      // {ngày: mm} mưa đo bằng vệ tinh, chỉ khi số liệu <= 3 ngày tuổi
+  if(!VT||VT.trang_thai!=='ok'||!VT.mua||!VT.mua.tram||satAgeDays()>3) return null;
+  const row=VT.mua.tram[id]; if(!row) return null; const m={};
+  VT.mua.ngay.forEach((d,i)=>{ if(row[i]!=null) m[d]=row[i]; }); return m;
+}
+function kmTxt(k){ const i=Math.floor(k); return 'Km'+i+'+'+String(Math.round((k-i)*1000)%1000).padStart(3,'0'); }
+function lc(t){ return t.charAt(0).toLowerCase()+t.slice(1); }
+function fmtVN(n,d){ return n.toFixed(d).replace('.',','); }
+function renderSat(){
+  const box=document.getElementById('sat-box'); satLayer.clearLayers();
+  if(!VT){ box.innerHTML='<p class="note" style="margin-top:0">Chưa có số liệu vệ tinh.</p>'; return; }
+  if(VT.trang_thai==='chua_cau_hinh'){
+    box.innerHTML='<p class="note" style="margin-top:0">Chưa kết nối Google Earth Engine nên chưa có số liệu vệ tinh. Cảnh báo hiện chỉ dựa vào dự báo mưa Open-Meteo.</p>'; return; }
+  const old=satAgeDays()>3, t=VT.updated;
+  let h='<p class="note" style="margin-top:0">Cập nhật '+t.slice(8,10)+'/'+t.slice(5,7)+' lúc '+t.slice(11)+'. '+
+    (old?'Số liệu đã quá 3 ngày nên không dùng cho cảnh báo.':(VT.mua?'Mưa đo bằng vệ tinh (GSMaP, IMERG) đã được ghép vào cảnh báo: ngày đã qua lấy mức lớn hơn giữa vệ tinh và Open-Meteo.':''))+'</p>';
+  const list=[];
+  DATA.zones.forEach(z=>{
+    const k=(VT.khu_vuc||{})[z.id]; if(!k) return;
+    const s1=k.S1||{}, s2=k.S2||{};
+    const s1t=s1.ngay?('ảnh '+fmtD(s1.ngay.slice(0,10))+(s1.chieu?' (quỹ đạo '+s1.chieu+')':'')+': '+((s1.vung||[]).length?(s1.vung.length+' vùng thay đổi'):'không thấy thay đổi')+(s1.dien_rong?', thay đổi diện rộng nghi do đất ẩm':'')):lc(s1.loi||'chưa có ảnh');
+    const s2t=s2.anh_moi_nhat?('ảnh '+fmtD(s2.anh_moi_nhat)+', quang mây '+s2['quang_may_%']+'%: '+((s2.vung||[]).length?(s2.vung.length+' vùng mất lớp phủ'):'không thấy thay đổi')):(s2.loi||'chưa có ảnh');
+    h+='<div class="sat-zone"><b>'+z.tinh+'</b><span>Sentinel-1 '+s1t+'</span><span></span><span>Sentinel-2 '+s2t+'</span></div>';
+    [['S1',s1,'s1','Sentinel-1'],['S2',s2,'s2','Sentinel-2']].forEach(([src,r,cls,name])=>(r.vung||[]).forEach(v=>{
+      list.push({z,v,name,cls,date:src==='S1'?(r.ngay||'').slice(0,10):r.anh_moi_nhat,wide:!!r.dien_rong});
+    }));
+  });
+  list.sort((a,b)=>(a.v.cach_duong_m>250)-(b.v.cach_duong_m>250)||b.v.ha-a.v.ha);
+  list.forEach(x=>{
+    const txt=x.z.tinh+' ~'+kmTxt(x.v.km)+' · '+x.name+' '+fmtD(x.date)+' · '+fmtVN(x.v.ha,1)+' ha · cách đường '+x.v.cach_duong_m+' m';
+    L.marker([x.v.xy[1],x.v.xy[0]],{icon:L.divIcon({className:'',html:'<div class="hs '+x.cls+'"></div>',iconSize:[14,14],iconAnchor:[7,7]})})
+      .bindPopup('<div class="pop"><b>Thay đổi trên ảnh '+x.name+'</b><br>'+txt+
+        (x.v.dVH_dB!=null?'<br>Tán xạ ngược VH đổi '+fmtVN(x.v.dVH_dB,1)+' dB':'')+(x.v.dNDVI!=null?'<br>NDVI đổi '+fmtVN(x.v.dNDVI,2):'')+
+        (x.wide?'<br><i>Cả khu vực thay đổi diện rộng, có thể do đất ẩm sau mưa.</i>':'')+
+        '<br>Cần kiểm tra hiện trường: có thể là sạt lở, nhưng cũng có thể do thi công, nổ mìn hoặc chặt cây.</div>').addTo(satLayer);
+  });
+  if(list.length){
+    h+='<ul class="alerts" id="sat-list">'+list.slice(0,8).map((x,i)=>'<li data-i="'+i+'" style="border-left-color:'+(x.cls==='s1'?'#6B3FA0':'#0E7C7B')+'"><b>'+x.z.tinh+' ~'+kmTxt(x.v.km)+' – '+x.name+'</b><span>'+
+      fmtD(x.date)+' · '+fmtVN(x.v.ha,1)+' ha · cách đường '+x.v.cach_duong_m+' m'+(x.wide?' · nghi do đất ẩm':'')+'</span></li>').join('')+'</ul>';
+  }
+  h+='<p class="note">Vùng thay đổi trên ảnh vệ tinh là tín hiệu để đi kiểm tra, chưa phải kết luận đã sạt. Radar khó nhìn vách đá rất dốc.</p>';
+  if(VT.loi&&VT.loi.length) h+='<p class="note">Lỗi lần chạy gần nhất: '+VT.loi.join('; ')+'</p>';
+  box.innerHTML=h;
+  const ul=document.getElementById('sat-list');
+  if(ul) ul.querySelectorAll('li').forEach(li=>li.onclick=()=>{const x=list[+li.dataset.i];map.setView([x.v.xy[1],x.v.xy[0]],15);});
+}
+/* ---------- Dự báo tổ hợp (như EFAS/LHASA): 82 kịch bản ECMWF IFS + GFS ---------- */
+const ENS_MODELS = 'ecmwf_ifs025,gfs025';
+const P_HI = 0.5, P_MID = 0.3;    // >=50% đạt ngưỡng -> mức 3; >=30% đạt ngưỡng hoặc >=50% Nguy hiểm -> mức 2; >=30% Nguy hiểm -> mức 1
+let ENS_N = 0, FS_TIME = null;
+async function fetchEnsemble(st){
+  const lat = st.map(s=>s.xy[1].toFixed(4)).join(','), lon = st.map(s=>s.xy[0].toFixed(4)).join(',');
+  for(const m of [ENS_MODELS,'ecmwf_ifs025']){
+    try{
+      const r = await fetch('https://ensemble-api.open-meteo.com/v1/ensemble?latitude='+lat+'&longitude='+lon+
+        '&daily=precipitation_sum&forecast_days=4&timezone=Asia%2FBangkok&models='+m);
+      if(!r.ok) continue; let j = await r.json(); return Array.isArray(j)?j:[j];
+    }catch(_){}
+  }
+  return null;
+}
+function ensMembers(loc){
+  const d=(loc&&loc.daily)||{}; const cols=Object.keys(d).filter(k=>k.startsWith('precipitation_sum')&&Array.isArray(d[k]))
+    .map(k=>d[k]).filter(c=>c.every(x=>x!=null));
+  return {times:d.time||[], cols};
+}
+function ensProb(pr, tm, et, cols, isRock){
+  if(!cols.length) return null; const idx={}; et.forEach((t,i)=>idx[t]=i); const out=[];
+  for(let k=0;k<4;k++){
+    const t=PAST_DAYS+k; if(!(tm[t] in idx)){ out.push(null); continue; }
+    const lvs=[], Ps=[];
+    cols.forEach(c=>{
+      const ser=pr.slice(); for(let kk=0;kk<4;kk++){ const tt=PAST_DAYS+kk; if(tm[tt] in idx) ser[tt]=c[idx[tm[tt]]]||0; }
+      const P=ser[t], P10=ser.slice(t-10,t).reduce((a,b)=>a+b,0);
+      lvs.push(levelOf(P,P10,isRock).lv); Ps.push(P);
+    });
+    const n=cols.length; Ps.sort((a,b)=>a-b); const q=f=>Ps[Math.min(n-1,Math.round(f*(n-1)))];
+    out.push({n, p2:lvs.filter(x=>x>=2).length/n, p3:lvs.filter(x=>x>=3).length/n, P10:q(.1), P50:q(.5), P90:q(.9)});
+  }
+  return out;
+}
+function probLevel(e){ if(!e) return 0; if(e.p3>=P_HI) return 3; if(e.p3>=P_MID||e.p2>=P_HI) return 2; return e.p2>=P_MID?1:0; }
+async function fetchForecast(){
+  const st = DATA.stations;
+  const lat = st.map(s=>s.xy[1].toFixed(4)).join(','), lon = st.map(s=>s.xy[0].toFixed(4)).join(',');
+  const url = REPLAY
+    ? 'https://historical-forecast-api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+      '&daily=precipitation_sum&start_date='+addDays(REPLAY,-PAST_DAYS)+'&end_date='+addDays(REPLAY,3)+'&timezone=Asia%2FBangkok'
+    : 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+      '&daily=precipitation_sum&past_days='+PAST_DAYS+'&forecast_days=4&timezone=Asia%2FBangkok';
+  const ensP = REPLAY ? Promise.resolve(null) : fetchEnsemble(st);   // tổ hợp chỉ có cho dự báo hiện tại
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('Máy chủ Open-Meteo trả lỗi '+r.status);
+  let j = await r.json(); if(!Array.isArray(j)) j=[j];
+  const res = st.map((s,i)=>{
+    const d = j[i].daily, prF = d.precipitation_sum.map(v=>v||0), tmF = d.time;
+    const off = prF.length-(PAST_DAYS+4);
+    if(off<0) throw new Error('Thiếu số liệu mưa cho ngày đã chọn');
+    const sr = satRainFor(s.id); let satDays = 0;          // ngày đã qua: lấy max(Open-Meteo, vệ tinh)
+    if(sr) for(let t=0;t<=off+PAST_DAYS;t++){ const x=sr[tmF[t]]; if(x!=null&&x>prF[t]){ prF[t]=x; satDays++; } }
+    const pr = prF.slice(off), time = tmF.slice(off);
+    return Object.assign({},s,{pr,time,days:evalStation(pr,time,s.type==='da'),satDays});
+  });
+  const ens = await ensP; ENS_N = 0;
+  if(ens) res.forEach((s,i)=>{
+    const m=ensMembers(ens[i]); const pe=ensProb(s.pr,s.time,m.times,m.cols,s.type==='da'); if(!pe) return;
+    ENS_N=m.cols.length;
+    s.days.forEach((o,k)=>{ const e=pe[k]; if(!e) return; o.ens=e; const pl=probLevel(e); if(pl>o.lv){ o.lv=pl; o.byEns=true; } });
+  });
+  // Hệ số an toàn mái dốc FS: tính trên máy chủ mỗi giờ, ghép theo ngày (không có khi xem lại ngày cũ)
+  FS_TIME = null;
+  if(!REPLAY && SV && SV.stations){
+    const byId={}; SV.stations.forEach(x=>byId[x.id]=x); FS_TIME=SV.updated;
+    res.forEach(s=>{
+      const sv=byId[s.id]; if(!sv||!sv.on_dinh) return;
+      s.od={beta:sv.on_dinh.beta,nguon:sv.on_dinh.nguon_doc,D:sv.on_dinh.D,FSkho:sv.on_dinh.FS_kho}; s.fsChart=sv.fs_chuoi||null;
+      const ng=(sv.fs_chuoi&&sv.fs_chuoi.nguong)||FS_NG, byDate={}; sv.days.forEach(x=>byDate[x.date]=x);
+      s.days.forEach(o=>{ const x=byDate[o.date]; if(!x||!x.fs) return;
+        o.fs=x.fs; o.fsLv=fsMuc(x.fs.FS,ng); if(x.fs_ens) o.fsEns=x.fs_ens;
+        const m=x.fs_muc||0; if(m>o.lv){ o.lv=m; o.byFs=true; } });       // chỉ nâng từ mức Nguy hiểm trở lên
+    });
+  }
+  res.forEach(s=>{ delete s.pr; delete s.time; });
+  return res;
+}
+function fmtD(iso){return iso.slice(8,10)+'/'+iso.slice(5,7);}
+function persistTxt(d){return 'Sau mưa vượt ngưỡng ngày '+fmtD(d.persist.date)+' ('+d.persist.P.toFixed(0)+' mm, '+d.persist.days+' ngày trước)';}
+
+/* ---------- Hiển thị ---------- */
+function renderStrip(){
+  const el=document.getElementById('strip'); let h='<div></div>';
+  DAY_TXT.forEach(t=>h+='<div class="hd">'+t+'</div>');
+  DATA.zones.forEach(z=>{
+    h+='<div class="zn">'+z.tinh+'<span>Km'+z.km0+'–'+z.km1+'</span></div>';
+    for(let k=0;k<4;k++){
+      const rows=RESULT.filter(s=>s.zone===z.id).map(s=>s.days[k]);
+      const lv=Math.max(...rows.map(d=>d.lv)), rt=Math.max(...rows.map(d=>d.ratio));
+      const onlyPersist=rows.filter(d=>d.lv===lv).every(d=>d.byPersist);
+      const pe=rows.filter(d=>d.ens); const p3=pe.length?Math.max(...pe.map(d=>d.ens.p3)):null;
+      h+='<div role="gridcell" tabindex="0" class="cellx lv'+lv+(k===DAY?' sel':'')+'" data-day="'+k+'" data-zone="'+z.id+'" style="background:'+LV_COL[lv]+'" '+
+         'aria-label="'+z.tinh+' '+DAY_TXT[k]+': '+LV_TXT[lv]+(onlyPersist?' sau mưa':'')+(p3!=null?', xác suất đạt ngưỡng '+Math.round(p3*100)+'%':'')+'">'+LV_SHORT[lv]+'<small>'+(onlyPersist?'sau mưa':p3!=null?Math.round(p3*100)+'%':rt.toFixed(2))+'</small>'+
+         (p3!=null&&!onlyPersist?'<span class="pb" aria-hidden="true"><i style="width:'+Math.max(2,Math.round(p3*100))+'%"></i></span>':'')+'</div>';
+    }
+  });
+  el.innerHTML=h;
+  el.querySelectorAll('.cellx').forEach(c=>{
+    const go=()=>{setDay(+c.dataset.day);const z=DATA.zones.find(x=>x.id===c.dataset.zone);
+      map.fitBounds(L.latLngBounds(zoneLines(z).flat().map(p=>[p[1],p[0]])).pad(0.3));};
+    c.onclick=go; c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+  });
+}
+function renderDays(){
+  document.getElementById('days').innerHTML=DAY_TXT.map((t,k)=>
+    '<button type="button" aria-pressed="'+(k===DAY)+'" data-k="'+k+'">'+t+' '+RESULT[0].days[k].date.slice(8,10)+'/'+RESULT[0].days[k].date.slice(5,7)+'</button>').join('');
+  document.querySelectorAll('#days button').forEach(b=>b.onclick=()=>setDay(+b.dataset.k));
+  document.getElementById('al-day').textContent=DAY_TXT[DAY].toLowerCase();
+}
+function renderMap(){
+  zoneLayer.clearLayers(); stLayer.clearLayers();
+  DATA.zones.forEach(z=>{
+    const lv=Math.max(...RESULT.filter(s=>s.zone===z.id).map(s=>s.days[DAY].lv));
+    const lines=zoneLines(z).map(l=>l.map(p=>[p[1],p[0]]));
+    L.polyline(lines,{color:'#fff',weight:11,opacity:.9}).addTo(zoneLayer);
+    L.polyline(lines,{color:LV_COL[lv],weight:6}).addTo(zoneLayer)
+      .bindTooltip(z.id+' '+z.tinh+': '+LV_TXT[lv]+(ROAD[z.id]?' (tim đường GRIP4)':''));
+  });
+  RESULT.forEach(s=>{
+    const d=s.days[DAY];
+    const xy=snapXY(s);
+    L.circleMarker([xy[1],xy[0]],{radius:s.type==='da'?9:7,color:'#fff',weight:2,fillColor:LV_COL[d.lv],fillOpacity:1})
+     .bindPopup('<div class="pop"><b>'+s.id+'</b><br>'+DAY_TXT[DAY]+' ('+d.date+')<br><b style="color:'+LV_COL[d.lv]+'">'+LV_TXT[d.lv]+'</b>'+
+       '<table><tr><td>Mưa ngày P</td><td>'+d.P.toFixed(1)+' mm</td></tr><tr><td>Mưa 10 ngày trước</td><td>'+d.P10.toFixed(0)+' mm</td></tr>'+
+       '<tr><td>Ngưỡng Mai Châu</td><td>'+d.thr.toFixed(0)+' mm</td></tr><tr><td>Tỷ số P/ngưỡng</td><td>'+d.ratio.toFixed(2)+'</td></tr>'+
+       (s.satDays?'<tr><td>Mưa vệ tinh</td><td>dùng cho '+s.satDays+' ngày</td></tr>':'')+
+       (d.ens?'<tr><td>Xác suất đạt ngưỡng</td><td><b>'+Math.round(d.ens.p3*100)+'%</b> ('+d.ens.n+' kịch bản)</td></tr>'+
+              '<tr><td>Xác suất ≥ Nguy hiểm</td><td>'+Math.round(d.ens.p2*100)+'%</td></tr>'+
+              '<tr><td>Mưa theo kịch bản</td><td>'+d.ens.P10.toFixed(0)+' – '+d.ens.P50.toFixed(0)+' – '+d.ens.P90.toFixed(0)+' mm<br><small>10% – 50% – 90%</small></td></tr>':'')+'</table>'+
+       (d.fs?'<table><tr><td colspan="2"><b>Ổn định mái dốc (SWCC)</b></td></tr>'+
+              '<tr><td>Hệ số an toàn FS</td><td><b style="color:'+(d.fsLv===1?'#7a5d00':LV_COL[d.fsLv])+'">'+fmtVN(d.fs.FS,2)+'</b> (khô '+fmtVN(s.od.FSkho,2)+')</td></tr>'+
+              '<tr><td>Đới ngấm / tầng phủ</td><td>'+fmtVN(d.fs.h,1)+' / '+fmtVN(s.od.D,1)+' m</td></tr>'+
+              (d.fs.hw>0?'<tr><td>Mực nước treo</td><td>'+fmtVN(d.fs.hw,1)+' m</td></tr>':'')+
+              '<tr><td>Lực hút dính</td><td>'+(d.fs.psi>0?fmtVN(d.fs.psi,0)+' kPa':'đã mất (đất ngấm nước)')+'</td></tr>'+
+              '<tr><td>Độ dốc mái</td><td>'+fmtVN(s.od.beta,0)+'° ('+s.od.nguon+')</td></tr>'+
+              (d.fsEns?'<tr><td>Xác suất FS &lt; 1</td><td><b>'+Math.round(d.fsEns.p1*100)+'%</b>; FS 10–50–90%: '+fmtVN(d.fsEns.FS10,2)+' – '+fmtVN(d.fsEns.FS50,2)+' – '+fmtVN(d.fsEns.FS90,2)+'</td></tr>':'')+
+              '</table>'+fsSvg(s.fsChart,DAY):'')+
+       (d.byEns?'<br><b>Mức nâng theo dự báo tổ hợp.</b>':'')+
+       (d.byFs?'<br><b>Mức nâng theo hệ số an toàn mái dốc.</b>':'')+
+       (d.persist?'<br><b>'+persistTxt(d)+'</b>'+(d.byPersist?' – giữ mức Nguy hiểm tới hết '+PERSIST_DAYS+' ngày.':''):'')+
+       (s.note?'<br><i>'+s.note+'</i>':'')+'</div>').addTo(stLayer);
+  });
+}
+function fsTxt(x){
+  return 'Hệ số an toàn mái FS '+fmtVN(x.fs.FS,2)+' (đới ngấm '+fmtVN(x.fs.h,1)+' m'+(x.fs.hw>0?', nước treo '+fmtVN(x.fs.hw,1)+' m':'')+')'+
+    (x.fsEns?', '+Math.round(x.fsEns.p1*100)+'% kịch bản FS < 1':'');
+}
+function reasonTxt(x){
+  if(x.byPersist) return persistTxt(x);
+  if(x.byFs) return fsTxt(x)+'; mưa '+x.P.toFixed(0)+' mm';
+  if(x.byEns) return Math.round(x.ens.p3*100)+'% trong '+x.ens.n+' kịch bản đạt ngưỡng trượt; mưa 90%: '+x.ens.P90.toFixed(0)+' mm (dự báo chính '+x.P.toFixed(0)+' mm)';
+  if(x.s.type==='da'&&x.lv===1&&x.ratio<0.7) return 'Điểm đá đổ: luôn cần chú ý, kể cả khi không mưa';
+  return 'Mưa '+x.P.toFixed(0)+' mm, ngưỡng '+x.thr.toFixed(0)+' mm (tỷ số '+x.ratio.toFixed(2)+')'+(x.ens?', xác suất đạt ngưỡng '+Math.round(x.ens.p3*100)+'%':'');
+}
+function renderAlerts(){                         // cảnh báo theo vùng (như varsom.no, MeteoAlarm), mở ra xem từng điểm
+  const ul=document.getElementById('alerts'); const groups=[];
+  DATA.zones.forEach(z=>{
+    const pts=RESULT.filter(s=>s.zone===z.id).map(s=>Object.assign({s},s.days[DAY])).filter(x=>x.lv>=1)
+      .sort((a,b)=>b.lv-a.lv||((b.ens&&b.ens.p3)||0)-((a.ens&&a.ens.p3)||0)||b.ratio-a.ratio);
+    if(pts.length) groups.push({z,pts,lv:pts[0].lv});
+  });
+  groups.sort((a,b)=>b.lv-a.lv);
+  if(!groups.length){ul.innerHTML='<li style="border-left-color:'+LV_COL[0]+'"><b>Không có điểm cần cảnh báo</b><span>Mưa dự báo dưới 70% ngưỡng gây trượt, xác suất tổ hợp thấp, hệ số an toàn mái dốc ≥ 1,2 và 7 ngày qua không có ngày vượt ngưỡng.</span></li>';return;}
+  ul.innerHTML=groups.map((g,i)=>{
+    const top=g.pts[0], same=g.pts.filter(x=>x.lv===g.lv).length;
+    return '<li data-i="'+i+'" style="border-left-color:'+LV_COL[g.lv]+'"><b>'+g.z.tinh+' Km'+g.z.km0+'–'+g.z.km1+' – '+LV_TXT[g.lv]+'</b>'+
+      '<span>'+same+' điểm ở mức này; cao nhất '+top.s.id+': '+reasonTxt(top)+'</span>'+
+      (g.pts.length>1?'<details onclick="event.stopPropagation()"><summary style="font-size:12px;color:var(--muted);cursor:pointer">Xem '+g.pts.length+' điểm</summary>'+
+        g.pts.map(x=>'<div style="font-size:12px;margin-top:3px"><b style="font-size:12px;display:inline;color:'+(x.lv===1?'#7a5d00':LV_COL[x.lv])+'">'+LV_SHORT[x.lv]+'</b> '+x.s.id+' – '+reasonTxt(x)+'</div>').join('')+'</details>':'')+'</li>';
+  }).join('');
+  ul.querySelectorAll('li').forEach(li=>li.onclick=()=>{const g=groups[+li.dataset.i];
+    map.fitBounds(L.latLngBounds(zoneLines(g.z).flat().map(p=>[p[1],p[0]])).pad(0.3));});
+}
+function renderStatus(){
+  const worst=Math.max(...RESULT.flatMap(s=>s.days.map(d=>d.lv)));
+  const wd=RESULT.flatMap(s=>s.days.map((d,k)=>({s,d,k}))).filter(x=>x.d.lv===worst).sort((a,b)=>a.k-b.k)[0];
+  document.getElementById('st-dot').style.background=LV_COL[worst];
+  document.getElementById('st-txt').textContent=LV_TXT[worst]+(REPLAY?' trong 4 ngày từ '+fmtD(REPLAY)+'/'+REPLAY.slice(0,4):' trong 4 ngày tới');
+  document.getElementById('st-sub').textContent=(worst>=2?'Sớm nhất: '+DAY_TXT[wd.k].toLowerCase()+' tại '+wd.s.id+'. ':'')+
+    (REPLAY?'Xem lại bằng số liệu mưa lưu trữ Open-Meteo.':'Cập nhật lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+
+      (ENS_N?' · tổ hợp '+ENS_N+' kịch bản ECMWF, GFS':' · chưa có dự báo tổ hợp'));
+  return {worst,wd};
+}
+const HUONG_DAN = [   // cảnh báo dựa trên tác động (WMO-No. 1150) – giống chuan_quoc_te.py
+  ['Duy trì tuần tra định kỳ các điểm nguy cơ.','Lưu thông bình thường, chú ý biển báo đoạn đèo dốc.'],
+  ['Theo dõi dự báo 6 giờ/lần; kiểm tra rãnh, cống, các điểm nguy cơ; chuẩn bị vật tư, biển báo, máy xúc.','Chú ý đá rơi ở đoạn vách dốc; không dừng đỗ dưới chân vách, taluy.'],
+  ['Trực 24/24; tuần tra điểm nguy cơ trước, trong và sau mưa; bố trí người cảnh giới, máy xúc tại chỗ; đặt biển cảnh báo; thông báo chính quyền địa phương.','Hạn chế qua đèo ban đêm và khi đang mưa to; không dừng đỗ dưới vách; theo dõi thông báo phân luồng.'],
+  ['Xem xét hạn chế hoặc tạm dừng lưu thông đoạn nguy cơ cao; cảnh giới 2 đầu đoạn; sẵn sàng phân luồng, cứu hộ; báo cáo Cục Đường bộ và Ban Chỉ huy PCTT&TKCN tỉnh.','Tránh đi qua khu vực nếu không cần thiết; tuân thủ phân luồng; thấy đất đá lăn, mặt đường nứt thì dừng cách xa và gọi 112.']];
+function renderGuide(){
+  if(!RESULT) return; document.getElementById('g-day').textContent=DAY_TXT[DAY].toLowerCase();
+  const byZone=DATA.zones.map(z=>({z,lv:Math.max(...RESULT.filter(s=>s.zone===z.id).map(s=>s.days[DAY].lv))}));
+  const lv=Math.max(...byZone.map(x=>x.lv)); const where=byZone.filter(x=>x.lv===lv).map(x=>x.z.tinh).join(', ');
+  document.getElementById('guide').innerHTML='<div class="lvl"><i style="background:'+LV_COL[lv]+'"></i>'+LV_TXT[lv]+(lv?' – '+where:'')+'</div>'+
+    '<div class="who"><b>Đơn vị quản lý đường</b>'+HUONG_DAN[lv][0]+'</div><div class="who"><b>Người tham gia giao thông</b>'+HUONG_DAN[lv][1]+'</div>';
+}
+document.getElementById('guide-all').innerHTML='<tr><td></td><td><b>Quản lý đường</b></td><td><b>Người đi đường</b></td></tr>'+
+  HUONG_DAN.map((g,i)=>'<tr><td><b style="color:'+(i===1?'#7a5d00':LV_COL[i])+'">'+LV_TXT[i]+'</b></td><td>'+g[0]+'</td><td>'+g[1]+'</td></tr>').join('');
+function fsSvg(c,day){                          // FS 14 ngày qua + 4 ngày tới, cột mưa ngày
+  if(!c) return ''; const W=260,H=104,l=26,r=6,t=8,b=18,n=c.FS.length,wx=(W-l-r)/n;
+  const fmax=Math.max(2,Math.ceil(Math.max(...c.FS)*2)/2), fmin=0.5, y=f=>t+(H-t-b)*(1-(Math.min(f,fmax)-fmin)/(fmax-fmin));
+  const pmax=Math.max(50,...c.P), x=i=>l+wx*(i+.5);
+  let g='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Diễn biến hệ số an toàn và mưa ngày" style="display:block;margin-top:6px">';
+  g+='<rect x="'+(l+wx*14)+'" y="'+t+'" width="'+(wx*(n-14))+'" height="'+(H-t-b)+'" fill="#E6E9E7"/>';
+  c.P.forEach((p,i)=>{ const h=(H-t-b)*0.45*p/pmax; g+='<rect x="'+(x(i)-wx*.35)+'" y="'+(H-b-h)+'" width="'+(wx*.7)+'" height="'+h+'" fill="#7FA7C9"><title>'+fmtD(c.t[i])+': mưa '+p.toFixed(0)+' mm</title></rect>'; });
+  [[c.nguong[0],LV_COL[3]],[c.nguong[1],LV_COL[2]]].forEach(([f,col])=>{ g+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+y(f)+'" y2="'+y(f)+'" stroke="'+col+'" stroke-dasharray="3 3"/><text x="'+(l-3)+'" y="'+(y(f)+3)+'" font-size="9" text-anchor="end" fill="'+col+'">'+fmtVN(f,1)+'</text>'; });
+  g+='<polyline fill="none" stroke="#1D2A30" stroke-width="2" points="'+c.FS.map((f,i)=>x(i).toFixed(1)+','+y(f).toFixed(1)).join(' ')+'"/>';
+  c.FS.forEach((f,i)=>{ g+='<circle cx="'+x(i)+'" cy="'+y(f)+'" r="'+(i===14+day?4:2)+'" fill="'+LV_COL[fsMuc(f,c.nguong)]+'"><title>'+fmtD(c.t[i])+': FS '+fmtVN(f,2)+'</title></circle>'; });
+  g+='<text x="'+l+'" y="'+(H-4)+'" font-size="9" fill="#5B6A70">'+fmtD(c.t[0])+'</text><text x="'+x(14)+'" y="'+(H-4)+'" font-size="9" text-anchor="middle" fill="#5B6A70">hôm nay</text>';
+  return g+'</svg><small style="color:#5B6A70">Đường đen: FS; cột xanh: mưa ngày; nền xám: 4 ngày dự báo.</small>';
+}
+function renderFS(){
+  const el=document.getElementById('fs-strip'); if(!RESULT) return; let h='<div></div>';
+  DAY_TXT.forEach(t=>h+='<div class="hd">'+t+'</div>');
+  DATA.zones.forEach(z=>{
+    h+='<div class="zn">'+z.tinh+'<span>Km'+z.km0+'–'+z.km1+'</span></div>';
+    for(let k=0;k<4;k++){
+      const rows=RESULT.filter(s=>s.zone===z.id&&s.days[k].fs).map(s=>s.days[k]);
+      if(!rows.length){ h+='<div class="cellx" style="background:#5B6A70"><small>'+(REPLAY?'không có khi xem lại':'chưa có')+'</small></div>'; continue; }
+      const fs=Math.min(...rows.map(d=>d.fs.FS)), lv=Math.max(...rows.map(d=>d.fsLv));
+      const pe=rows.filter(d=>d.fsEns), p1=pe.length?Math.max(...pe.map(d=>d.fsEns.p1)):null;
+      h+='<div role="gridcell" tabindex="0" class="cellx lv'+lv+(k===DAY?' sel':'')+'" data-day="'+k+'" data-zone="'+z.id+'" style="background:'+LV_COL[lv]+'" '+
+        'aria-label="'+z.tinh+' '+DAY_TXT[k]+': hệ số an toàn nhỏ nhất '+fmtVN(fs,2)+(p1!=null?', '+Math.round(p1*100)+'% kịch bản FS nhỏ hơn 1':'')+'">FS '+fmtVN(fs,2)+
+        '<small>'+(p1!=null?Math.round(p1*100)+'% FS&lt;1':'&nbsp;')+'</small></div>';
+    }
+  });
+  el.innerHTML=h;
+  const t=document.getElementById('fs-time');
+  if(t) t.textContent=REPLAY?'Chế độ xem lại chỉ có cảnh báo theo mưa; hệ số an toàn chỉ tính cho dự báo hiện tại.':
+    FS_TIME?'Tính trên máy chủ lúc '+FS_TIME.slice(11)+' ngày '+FS_TIME.slice(8,10)+'/'+FS_TIME.slice(5,7)+' (cập nhật mỗi giờ).':'Chưa có kết quả tính từ máy chủ.';
+  el.querySelectorAll('.cellx[data-day]').forEach(c=>{
+    const go=()=>{setDay(+c.dataset.day);const z=DATA.zones.find(x=>x.id===c.dataset.zone);
+      map.fitBounds(L.latLngBounds(zoneLines(z).flat().map(p=>[p[1],p[0]])).pad(0.3));};
+    c.onclick=go; c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+  });
+}
+function renderFSMethod(){
+  document.getElementById('fs-method').innerHTML=
+    '<p>Hệ số an toàn FS được tính cho từng điểm dự báo trên tuyến (không áp dụng cho vách đá, nơi cơ chế phá hoại là đá đổ), mỗi ngày một lần theo các bước:</p><ol style="padding-left:18px;margin:4px 0">'+
+    '<li><b>Nước mưa ngấm vào đất:</b> lượng nước thấm tích lũy từ chuỗi mưa ngày nhiều tuần gần nhất (kể cả mưa đo bằng vệ tinh), có kể phần nước tiêu thoát dần sau mưa; từ đó xác định chiều sâu đới ngấm và mực nước treo trên mặt đá gốc khi đới ngấm vượt chiều dày tầng phủ.</li>'+
+    '<li><b>Lực hút dính của đất chưa bão hòa:</b> xác định theo đường cong đặc trưng đất–nước (SWCC); lực hút giảm và mất đi khi đất ngấm nước.</li>'+
+    '<li><b>Sức kháng cắt của đất không bão hòa:</b> theo lý thuyết cơ học đất không bão hòa, gồm lực dính, ma sát và phần do lực hút dính.</li>'+
+    '<li><b>Ổn định mái:</b> sơ đồ mái dốc vô hạn, xét mặt trượt ở đáy đới ngấm và ở mặt tiếp xúc tầng phủ – đá gốc, lấy FS nhỏ nhất. Độ dốc từng đoạn lấy từ mô hình số độ cao Copernicus 30 m; chiều dày tầng phủ thay đổi theo độ dốc.</li>'+
+    '<li><b>Dự báo xác suất:</b> tính lại FS với 82 kịch bản mưa tổ hợp ECMWF, GFS để có tỷ lệ kịch bản FS &lt; 1.</li></ol>'+
+    '<p>FS &lt; 1,0 → Đạt ngưỡng trượt; FS &lt; 1,2 → Nguy hiểm (nâng mức cảnh báo); FS &lt; 1,3 → cần chú ý (chỉ hiển thị). Từ 30% kịch bản FS &lt; 1 cũng nâng lên Nguy hiểm.</p>'+
+    '<p>Mô hình đã được hiệu chỉnh sơ bộ với mưa 2023–2026 và các sự cố đã xác minh trên tuyến. Thông số đất là giá trị đặc trưng cho đất tàn tích, chưa có thí nghiệm tại tuyến; FS dùng để theo dõi diễn biến theo mưa, không thay cho tính toán thiết kế.</p>';
+}
+function setDay(k){DAY=k;renderStrip();renderFS();renderDays();renderMap();renderAlerts();renderGuide();}
+
+/* ---------- Thông báo tự động ---------- */
+function notify(w){
+  if(w.worst<2||!('Notification' in window)||Notification.permission!=='granted') return;
+  const key=w.worst+'|'+w.wd.s.id+'|'+w.wd.d.date;
+  if(key===lastNotified) return; lastNotified=key;
+  new Notification('Cảnh báo sạt lở QL6: '+LV_TXT[w.worst],{body:w.wd.s.id+' – '+w.wd.d.date+': '+(w.wd.d.byPersist?persistTxt(w.wd.d):'mưa '+w.wd.d.P.toFixed(0)+' mm, ngưỡng '+w.wd.d.thr.toFixed(0)+' mm')});
+}
+async function run(){
+  const btn=document.getElementById('btn-refresh'); btn.disabled=true; btn.textContent='Đang cập nhật…';
+  if(!loadRoad.done){ loadRoad.done=true; await loadRoad(); }
+  if(!renderFSMethod.done){ renderFSMethod.done=true; renderFSMethod(); }
+  await loadServer();
+  await loadSat();
+  try{
+    RESULT=await fetchForecast(); setDay(DAY);
+    if(REPLAY){ renderStatus(); showEvents(); }
+    else{ notify(renderStatus()); try{ localStorage.setItem('ql6_du_bao',JSON.stringify({t:Date.now(),r:RESULT})); }catch(_){} }
+  }catch(e){
+    let saved=null; try{ saved=JSON.parse(localStorage.getItem('ql6_du_bao')||'null'); }catch(_){}
+    if(saved&&saved.r&&!REPLAY){
+      RESULT=saved.r; setDay(DAY); renderStatus();
+      const t=new Date(saved.t);
+      document.getElementById('st-sub').textContent=(navigator.onLine?'Chưa cập nhật được. ':'Mất kết nối mạng. ')+
+        'Đang xem dự báo lưu lúc '+t.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+' ngày '+t.toLocaleDateString('vi-VN')+'.';
+    }else{
+      document.getElementById('st-dot').style.background='#5B6A70';
+      document.getElementById('st-txt').textContent=navigator.onLine?'Chưa lấy được dự báo':'Mất kết nối mạng';
+      document.getElementById('st-sub').textContent=e.message+'. Kiểm tra kết nối mạng rồi bấm Cập nhật ngay.';
+    }
+  }
+  btn.disabled=false; btn.textContent='Cập nhật ngay';
+}
+document.getElementById('btn-refresh').onclick=run;
+document.getElementById('btn-notify').onclick=async()=>{
+  if(!('Notification' in window)){alert('Trình duyệt này không hỗ trợ thông báo.');return;}
+  const p=await Notification.requestPermission();
+  document.getElementById('btn-notify').textContent=p==='granted'?'Đã bật thông báo':'Thông báo bị chặn';
+};
+document.getElementById('auto-note').textContent='Trang tự cập nhật mỗi '+REFRESH_MIN+' phút khi đang mở. Cảnh báo qua Telegram/Zalo chạy tự động trên GitHub Actions kể cả khi không ai mở trang; số liệu vệ tinh cập nhật 2 lần mỗi ngày.';
+function showEvents(){
+  const box=document.getElementById('ev-box'); if(!REPLAY){box.innerHTML='';return;}
+  const a=addDays(REPLAY,-7), b=addDays(REPLAY,3);
+  const ev=EVENTS.filter(e=>e[0]>=a&&e[0]<=b);
+  box.innerHTML=ev.length?'Sự cố đã ghi nhận quanh ngày này:'+ev.map(e=>'<div class="ev"><b>'+e[0].split('-').reverse().join('/')+'</b> – '+e[1]+'</div>').join('')
+    :'Không có sự cố QL6 nào đã xác minh trong khoảng 7 ngày trước đến 3 ngày sau ngày này.';
+}
+function setMode(iso){
+  REPLAY=iso||null; document.body.classList.toggle('xem-lai',!!REPLAY);
+  DAY_TXT=REPLAY?['Ngày xem','+1 ngày','+2 ngày','+3 ngày']:['Hôm nay','Ngày mai','+2 ngày','+3 ngày'];
+  document.getElementById('btn-live').hidden=!REPLAY; document.getElementById('btn-refresh').hidden=!!REPLAY;
+  const u=new URL(location.href); if(REPLAY) u.searchParams.set('ngay',REPLAY); else u.searchParams.delete('ngay');
+  try{ history.replaceState(null,'',u); }catch(_){}
+  DAY=0; showEvents(); run();
+}
+(function(){
+  const inp=document.getElementById('replay-date'); const max=addDays(new Date().toISOString().slice(0,10),-4); inp.max=max;
+  document.getElementById('btn-replay').onclick=()=>{
+    const v=inp.value; if(!v){alert('Chọn một ngày trước.');return;}
+    if(v>max||v<'2022-01-01'){alert('Chọn ngày từ 01/01/2022 đến '+max.split('-').reverse().join('/')+' (cần đủ 3 ngày sau ngày xem).');return;}
+    setMode(v);
+  };
+  document.getElementById('btn-live').onclick=()=>setMode(null);
+  const q=new URLSearchParams(location.search).get('ngay');
+  if(q&&/^\d{4}-\d{2}-\d{2}$/.test(q)&&q<=max){ inp.value=q; setMode(q); } else run();
+})();
+setInterval(()=>{ if(!REPLAY) run(); },REFRESH_MIN*60*1000);
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));
+}
+</script>
+</body>
+</html>
