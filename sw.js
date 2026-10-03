@@ -1,7 +1,7 @@
 // Bản quyền © 2026 PGS. TS. Nguyễn Châu Lân, Trường Đại học Giao thông vận tải. Bảo lưu mọi quyền – xem LICENSE.
 // Service worker: mở được app khi mất mạng (hiện dự báo lần cuối), cập nhật khi có mạng.
-const CACHE = "ql6-v10";
-const SHELL = ['./', './index.html', './od.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
+const CACHE = "ql6-v11";
+const SHELL = ['./', './index.html', './on_dinh.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
   './vendor/leaflet/leaflet.js', './vendor/leaflet/leaflet.css',
   './vendor/leaflet/images/layers.png', './vendor/leaflet/images/layers-2x.png', './chinh-sach-rieng-tu.html'];
 self.addEventListener('install', e => {
@@ -16,7 +16,7 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (e.request.method !== 'GET') return;
   // Dự báo mưa, số liệu cảnh báo/vệ tinh và trang chính: ưu tiên mạng, mất mạng thì dùng bản lưu gần nhất
-  if (url.includes('open-meteo.com') || url.includes('/data/') || url.includes('od.js') || e.request.mode === 'navigate') {
+  if (url.includes('open-meteo.com') || url.includes('/data/') || url.includes('on_dinh.js') || e.request.mode === 'navigate') {
     e.respondWith(fetch(e.request).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)); return r; })
       .catch(() => caches.match(e.request, {ignoreSearch: e.request.mode === 'navigate'})));
     return;
