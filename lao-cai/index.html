@@ -191,7 +191,8 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       1) <b>Quyết định 18/2021/QĐ-TTg, Điều 46</b> – Lào Cai, Yên Bái thuộc khu vực 1. Mưa 100–200 mm/24 h sau 1–2 ngày mưa: vùng nguy cơ thấp, trung bình → cấp 1; cao → cấp 2; rất cao → cấp 3.
       Mưa trên 200–400 mm/24 h sau hơn 2 ngày mưa: thấp → cấp 1; trung bình → cấp 2; cao, rất cao → cấp 3. Mưa trên 400 mm/24 h sau hơn 2 ngày mưa: thấp, trung bình → cấp 2; cao, rất cao → cấp 3.
       Trên trang: cấp 1 = Cần chú ý, cấp 2 = Nguy hiểm, cấp 3 = Đạt ngưỡng trượt; “ngày mưa” là ngày có mưa từ 16 mm (mưa vừa trở lên);
-      vùng nguy cơ lấy gần đúng theo độ dốc địa hình (dưới 15° thấp, 15–25° trung bình, 25–35° cao, từ 35° rất cao) khi chưa có bản đồ phân vùng chính thức; mưa từ 100 mm nhưng chưa có ngày mưa trước → Cần chú ý.<br>
+      vùng nguy cơ lấy gần đúng theo độ dốc địa hình (dưới 15° thấp, 15–25° trung bình, 25–35° cao, từ 35° rất cao) khi chưa có bản đồ phân vùng chính thức; điểm dự báo có điểm sạt trượt đã điều tra (cấp rủi ro 2–3) trong bán kính 1 km được nâng vùng nguy cơ lên một bậc;
+      mưa từ 100 mm nhưng chưa có ngày mưa trước → Cần chú ý.<br>
       2) <b>Ngưỡng thực nghiệm</b> từ các trận Liên Minh (Sa Pa, 2023) và Làng Nủ (Bảo Yên, 2024): mưa 1 giờ trên 40 mm và mưa tích lũy trên 250 mm có thể gây trượt lở, lũ bùn đá
       (Nguyễn Châu Lân, Tuổi Trẻ 03/10/2024) → Đạt ngưỡng trượt; mưa giờ lấy từ dự báo theo giờ của Open-Meteo.</p>
     <p class="note">Hệ số an toàn mái dốc FS tính theo nước mưa ngấm dần vào đất và lực hút dính mất đi khi đất ướt (SWCC):
@@ -271,7 +272,8 @@ let DH = null;            // độ dốc từng điểm (DEM Copernicus 30 m) l�
 async function loadServer(){
   if(DH) return;
   try{ const r=await fetch('data/alerts.json',{cache:'no-store'}); const sv=r.ok?await r.json():null; const diem={};
-    (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta}; });
+    (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta};
+      if(x.lop_nang) (diem[x.id]=diem[x.id]||{}).nang=1; });   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
     if(Object.keys(diem).length) DH={nguon:'DEM Copernicus 30 m',diem};
   }catch(_){}
 }
@@ -364,7 +366,7 @@ function mucQD18(pr,t,l,hmax){
   const tl=E>QD_TICH_LUY&&hmax!=null&&hmax>QD_GIO; if(tl) lv=3;
   return {thr:100,ratio:P/100,lv,qd18:{cap,n,E,lop:l,hmax},byTL:tl};
 }
-function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return lopNguyCo(g?g.doc:null); }
+function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return Math.min(3,lopNguyCo(g?g.doc:null)+(g&&g.nang?1:0)); }
 // Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới); gio: {ngày: mưa giờ lớn nhất}
 function evalStation(pr, times, isRock, lop, gio){
   const sum=(a,b)=>pr.slice(a,b).reduce((x,y)=>x+y,0);

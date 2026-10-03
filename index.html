@@ -268,7 +268,8 @@ let DH = null;            // độ dốc từng điểm (DEM Copernicus 30 m) l�
 async function loadServer(){
   if(DH) return;
   try{ const r=await fetch('data/alerts.json',{cache:'no-store'}); const sv=r.ok?await r.json():null; const diem={};
-    (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta}; });
+    (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta};
+      if(x.lop_nang) (diem[x.id]=diem[x.id]||{}).nang=1; });   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
     if(Object.keys(diem).length) DH={nguon:'DEM Copernicus 30 m',diem};
   }catch(_){}
 }
@@ -361,7 +362,7 @@ function mucQD18(pr,t,l,hmax){
   const tl=E>QD_TICH_LUY&&hmax!=null&&hmax>QD_GIO; if(tl) lv=3;
   return {thr:100,ratio:P/100,lv,qd18:{cap,n,E,lop:l,hmax},byTL:tl};
 }
-function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return lopNguyCo(g?g.doc:null); }
+function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return Math.min(3,lopNguyCo(g?g.doc:null)+(g&&g.nang?1:0)); }
 // Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới); gio: {ngày: mưa giờ lớn nhất}
 function evalStation(pr, times, isRock, lop, gio){
   const sum=(a,b)=>pr.slice(a,b).reduce((x,y)=>x+y,0);
