@@ -5,7 +5,7 @@
 //     hướng dốc, chênh cao; góc mái tính toán = độ dốc lớn nhất của lưới (hoặc góc người dùng đo).
 //  3. Mưa tại đúng điểm: 45 ngày qua + 4 ngày tới, 82 kịch bản tổ hợp -> ngưỡng Mai Châu và hệ số an toàn FS (on_dinh.js).
 //  4. Ảnh: phân loại điểm ảnh – thực vật, đất, đá/đất sáng mới lộ, bóng tối, bầu trời -> ghi chú hiện trạng mái.
-//  5. Bối cảnh: khoảng cách tới QL6, điểm dự báo gần nhất, điểm trượt đã điều tra, điểm nguy cơ của Cục Đường bộ.
+//  5. Bối cảnh: khoảng cách tới tuyến (QL6 hoặc các quốc lộ của vùng), điểm dự báo gần nhất, điểm trượt đã điều tra, điểm nguy cơ của Cục Đường bộ.
 (function () {
   const $ = id => document.getElementById(id);
   const KQ = [];                       // các lần đánh giá trong phiên
@@ -138,8 +138,8 @@
   function boiCanh(lat, lon) {
     const ll = L.latLng(lat, lon), dist = xy => map.distance(ll, [xy[1], xy[0]]);
     let dTuyen = Infinity;
-    for (let i = 1; i < DATA.route.length; i++) {          // khoảng cách tới đoạn thẳng (gần đúng trên mặt phẳng)
-      const a = DATA.route[i - 1], b = DATA.route[i], k = Math.cos(lat * Math.PI / 180) * 111320, kk = 111320;
+    for (const R of ROUTES) for (let i = 1; i < R.length; i++) {   // khoảng cách tới đoạn thẳng (gần đúng trên mặt phẳng)
+      const a = R[i - 1], b = R[i], k = Math.cos(lat * Math.PI / 180) * 111320, kk = 111320;
       const ax = (a[0] - lon) * k, ay = (a[1] - lat) * kk, bx = (b[0] - lon) * k, by = (b[1] - lat) * kk;
       const dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, -(ax * dx + ay * dy) / ((dx * dx + dy * dy) || 1)));
       dTuyen = Math.min(dTuyen, Math.hypot(ax + t * dx, ay + t * dy));
@@ -195,7 +195,7 @@
       '<div><b style="color:' + (lv === 1 ? '#7a5d00' : LV_COL[lv]) + '">' + LV_TXT[lv] + '</b> ' + (lv ? '(' + DAY_TXT[kd].toLowerCase() + ')' : 'trong 4 ngày tới') + '<br>' +
       '<small>' + r.ten + ' · ' + r.vt.lat.toFixed(5) + ', ' + r.vt.lon.toFixed(5) + ' (' + r.vt.nguon + ')' + (r.ex.thoiDiem ? ' · chụp ' + r.ex.thoiDiem.slice(0, 16).replace(/:/, '-').replace(/:/, '-') : '') + '</small></div></div>';
     h += '<table class="anh-bang">' +
-      hang('Vị trí', 'cách QL6 ' + (r.bc.dTuyen < 1000 ? Math.round(r.bc.dTuyen) + ' m' : fmtVN(r.bc.dTuyen / 1000, 1) + ' km') + '; điểm dự báo gần nhất ' + r.bc.gan.s.id + ' (' + fmtVN(r.bc.gan.d / 1000, 1) + ' km)') +
+      hang('Vị trí', 'cách ' + TEN_TUYEN + ' ' + (r.bc.dTuyen < 1000 ? Math.round(r.bc.dTuyen) + ' m' : fmtVN(r.bc.dTuyen / 1000, 1) + ' km') + '; điểm dự báo gần nhất ' + r.bc.gan.s.id + ' (' + fmtVN(r.bc.gan.d / 1000, 1) + ' km)') +
       hang('Trong bán kính 1 km', r.bc.trUot + ' điểm trượt đã điều tra' + (r.bc.nguyCo.length ? '; điểm nguy cơ Cục ĐB: ' + r.bc.nguyCo.join(', ') : '')) +
       hang('Địa hình (DEM)', 'cao độ ' + Math.round(r.dh.caoDo) + ' m; dốc tại điểm ' + fmtVN(r.dh.docTam, 0) + '°, dốc nhất ' + fmtVN(r.dh.docMax, 0) + '°; mái quay hướng ' + huongTxt(r.dh.huong) + '; chênh cao ' + Math.round(r.dh.chenhCao) + ' m trong 240 m') +
       hang('Mưa hôm nay', fmtVN(d0.P, 0) + ' mm; 10 ngày trước ' + fmtVN(d0.P10, 0) + ' mm; ngưỡng Mai Châu ' + fmtVN(d0.thr, 0) + ' mm (tỷ số ' + fmtVN(d0.ratio, 2) + ')' + (d0.ens ? '; xác suất đạt ngưỡng ' + Math.round(d0.ens.p3 * 100) + '%' : ''));
@@ -226,7 +226,7 @@
         doc_dem_tam: +r.dh.docTam.toFixed(1), doc_dem_max: +r.dh.docMax.toFixed(1), huong_mai: huongTxt(r.dh.huong), cao_do: Math.round(r.dh.caoDo),
         ngay: r.md.days.map(d => d.date), mua_mm: r.md.days.map(d => +d.P.toFixed(1)), fs: r.laDa ? null : r.md.days.map(d => +d.fs.FS.toFixed(3)),
         xac_suat_fs_nho_hon_1: r.laDa ? null : r.md.days.map(d => d.fsEns ? d.fsEns.p1 : null),
-        thuc_vat_pt: r.anh.tv, dat_pt: r.anh.dat, da_sang_pt: r.anh.sang, cach_QL6_m: Math.round(r.bc.dTuyen)}}))};
+        thuc_vat_pt: r.anh.tv, dat_pt: r.anh.dat, da_sang_pt: r.anh.sang, cach_tuyen_m: Math.round(r.bc.dTuyen)}}))};
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(g, null, 1)], {type: 'application/geo+json'}));
     a.download = 'danh_gia_mai_doc_' + new Date().toISOString().slice(0, 10) + '.geojson'; a.click();
   }

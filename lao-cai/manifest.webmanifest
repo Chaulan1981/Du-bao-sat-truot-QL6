@@ -1,0 +1,43 @@
+{
+  "name": "Dự báo sạt lở Lào Cai",
+  "short_name": "Sạt lở Lào Cai",
+  "description": "Dự báo mưa 4 ngày và cảnh báo nguy cơ sạt lở trên các quốc lộ tỉnh Lào Cai (QL4D, QL32, QL70, QL279, QL4E).",
+  "lang": "vi",
+  "start_url": "./?nguon=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#E6E9E7",
+  "theme_color": "#1D2A30",
+  "categories": [
+    "weather",
+    "navigation",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "../icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "../icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

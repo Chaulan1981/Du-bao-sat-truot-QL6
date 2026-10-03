@@ -31,6 +31,7 @@ aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto
 .head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
 .head h1{font-size:19px;line-height:1.2;margin:0 0 4px;font-weight:700}
 .head p{margin:0;color:var(--muted);font-size:13px}
+.head p.vung-khac{margin:0 0 6px}.vung-khac a{color:var(--ochre);font-weight:600}
 .status{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:var(--r);
   background:#fff;border:1px solid var(--line)}
 .status .dot{width:14px;height:14px;border-radius:50%;flex:none;background:var(--muted)}
@@ -119,6 +120,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
 <aside>
   <div class="head">
     <h1>Dự báo sạt lở Quốc lộ 6</h1>
+    <p class="vung-khac"><a href="lao-cai/">Xem dự báo các quốc lộ tỉnh Lào Cai →</a></p>
     <p>Mưa dự báo 4 ngày (dự báo chính và 82 kịch bản tổ hợp ECMWF, GFS) cộng mưa đo bằng vệ tinh, so với ngưỡng gây trượt Mai Châu và tính hệ số an toàn mái dốc theo nước ngấm và lực hút dính của đất (SWCC). Tự cập nhật 30 phút một lần.</p>
     <div class="status" id="status" aria-live="polite">
       <span class="dot" id="st-dot"></span>
@@ -280,7 +282,10 @@ const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
 const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   {maxZoom:18,attribution:'Ảnh vệ tinh © Esri'});
-L.polyline(DATA.route.map(p=>[p[1],p[0]]),{color:'#5B6A70',weight:3,opacity:.8}).addTo(map);
+const ROUTES = DATA.routes || [DATA.route];          // QL6: 1 tuyến; vùng khác: nhiều tuyến
+const TEN_TUYEN = DATA.ten_tuyen || 'QL6';
+function zNhan(z){ return z.nhan || ('Km'+z.km0+'–'+z.km1); }
+ROUTES.forEach(r=>L.polyline(r.map(p=>[p[1],p[0]]),{color:'#5B6A70',weight:3,opacity:.8}).addTo(map));
 const zoneLayer = L.layerGroup().addTo(map);
 const stLayer = L.layerGroup().addTo(map);
 const lsLayer = L.layerGroup();
@@ -318,7 +323,7 @@ async function loadRoad(){
       ROAD[f.properties.kv]=c; });
   }catch(_){}
 }
-function zoneLines(z){ return ROAD[z.id] ? ROAD[z.id] : [z.line]; }
+function zoneLines(z){ return ROAD[z.id] ? ROAD[z.id] : (z.lines || [z.line]); }
 function snapXY(s){                               // điểm dự báo trên tuyến -> điểm gần nhất trên tim đường thật
   if(s.type==='da'||!ROAD[s.zone]) return s.xy; let best=null,bd=1e9;
   ROAD[s.zone].forEach(l=>l.forEach(p=>{const d=(p[0]-s.xy[0])**2+(p[1]-s.xy[1])**2; if(d<bd){bd=d;best=p;}}));
@@ -498,7 +503,7 @@ function renderStrip(){
   const el=document.getElementById('strip'); let h='<div></div>';
   DAY_TXT.forEach(t=>h+='<div class="hd">'+t+'</div>');
   DATA.zones.forEach(z=>{
-    h+='<div class="zn">'+z.tinh+'<span>Km'+z.km0+'–'+z.km1+'</span></div>';
+    h+='<div class="zn">'+z.tinh+'<span>'+zNhan(z)+'</span></div>';
     for(let k=0;k<4;k++){
       const rows=RESULT.filter(s=>s.zone===z.id).map(s=>s.days[k]);
       const lv=Math.max(...rows.map(d=>d.lv)), rt=Math.max(...rows.map(d=>d.ratio));
@@ -578,7 +583,7 @@ function renderAlerts(){                         // cảnh báo theo vùng (như
   if(!groups.length){ul.innerHTML='<li style="border-left-color:'+LV_COL[0]+'"><b>Không có điểm cần cảnh báo</b><span>Mưa dự báo dưới 70% ngưỡng gây trượt, xác suất tổ hợp thấp, hệ số an toàn mái dốc ≥ 1,2 và 7 ngày qua không có ngày vượt ngưỡng.</span></li>';return;}
   ul.innerHTML=groups.map((g,i)=>{
     const top=g.pts[0], same=g.pts.filter(x=>x.lv===g.lv).length;
-    return '<li data-i="'+i+'" style="border-left-color:'+LV_COL[g.lv]+'"><b>'+g.z.tinh+' Km'+g.z.km0+'–'+g.z.km1+' – '+LV_TXT[g.lv]+'</b>'+
+    return '<li data-i="'+i+'" style="border-left-color:'+LV_COL[g.lv]+'"><b>'+g.z.tinh+' '+zNhan(g.z)+' – '+LV_TXT[g.lv]+'</b>'+
       '<span>'+same+' điểm ở mức này; cao nhất '+top.s.id+': '+reasonTxt(top)+'</span>'+
       (g.pts.length>1?'<details onclick="event.stopPropagation()"><summary style="font-size:12px;color:var(--muted);cursor:pointer">Xem '+g.pts.length+' điểm</summary>'+
         g.pts.map(x=>'<div style="font-size:12px;margin-top:3px"><b style="font-size:12px;display:inline;color:'+(x.lv===1?'#7a5d00':LV_COL[x.lv])+'">'+LV_SHORT[x.lv]+'</b> '+x.s.id+' – '+reasonTxt(x)+'</div>').join('')+'</details>':'')+'</li>';
@@ -627,7 +632,7 @@ function renderFS(){
   const el=document.getElementById('fs-strip'); if(!RESULT) return; let h='<div></div>';
   DAY_TXT.forEach(t=>h+='<div class="hd">'+t+'</div>');
   DATA.zones.forEach(z=>{
-    h+='<div class="zn">'+z.tinh+'<span>Km'+z.km0+'–'+z.km1+'</span></div>';
+    h+='<div class="zn">'+z.tinh+'<span>'+zNhan(z)+'</span></div>';
     for(let k=0;k<4;k++){
       const rows=RESULT.filter(s=>s.zone===z.id&&s.days[k].fs).map(s=>s.days[k]);
       if(!rows.length){ h+='<div class="cellx" style="background:#5B6A70"><small>chưa có</small></div>'; continue; }
@@ -671,7 +676,7 @@ function notify(w){
   if(w.worst<2||!('Notification' in window)||Notification.permission!=='granted') return;
   const key=w.worst+'|'+w.wd.s.id+'|'+w.wd.d.date;
   if(key===lastNotified) return; lastNotified=key;
-  new Notification('Cảnh báo sạt lở QL6: '+LV_TXT[w.worst],{body:w.wd.s.id+' – '+w.wd.d.date+': '+(w.wd.d.byPersist?persistTxt(w.wd.d):'mưa '+w.wd.d.P.toFixed(0)+' mm, ngưỡng '+w.wd.d.thr.toFixed(0)+' mm')});
+  new Notification('Cảnh báo sạt lở '+TEN_TUYEN+': '+LV_TXT[w.worst],{body:w.wd.s.id+' – '+w.wd.d.date+': '+(w.wd.d.byPersist?persistTxt(w.wd.d):'mưa '+w.wd.d.P.toFixed(0)+' mm, ngưỡng '+w.wd.d.thr.toFixed(0)+' mm')});
 }
 async function run(){
   const btn=document.getElementById('btn-refresh'); btn.disabled=true; btn.textContent='Đang cập nhật…';
@@ -709,7 +714,7 @@ function showEvents(){
   const a=addDays(REPLAY,-7), b=addDays(REPLAY,3);
   const ev=EVENTS.filter(e=>e[0]>=a&&e[0]<=b);
   box.innerHTML=ev.length?'Sự cố đã ghi nhận quanh ngày này:'+ev.map(e=>'<div class="ev"><b>'+e[0].split('-').reverse().join('/')+'</b> – '+e[1]+'</div>').join('')
-    :'Không có sự cố QL6 nào đã xác minh trong khoảng 7 ngày trước đến 3 ngày sau ngày này.';
+    :'Không có sự cố '+TEN_TUYEN+' nào đã xác minh trong khoảng 7 ngày trước đến 3 ngày sau ngày này.';
 }
 function setMode(iso){
   REPLAY=iso||null; document.body.classList.toggle('xem-lai',!!REPLAY);
