@@ -196,6 +196,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       Sau ngày mưa vượt ngưỡng, điểm đó giữ mức Nguy hiểm thêm 7 ngày vì nhiều vụ sạt xảy ra muộn sau mưa.
       Mái đá như Km124+300 có thể đổ lở cả khi không mưa nên luôn ở mức cần chú ý.</p>
     <p class="note" id="ai-note"></p>
+    <div id="nc-note"></div>
     <p class="note">Hệ số an toàn mái dốc FS tính theo nước mưa ngấm dần vào đất và lực hút dính mất đi khi đất ướt (SWCC):
       FS &lt; 1,2 nâng lên Nguy hiểm, FS &lt; 1 lên Đạt ngưỡng trượt. Cách này bắt được cả đợt mưa kéo dài nhiều ngày mà từng ngày đều dưới ngưỡng.</p>
   </section>
@@ -221,6 +222,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       <li><a href="data/canhbao.geojson" download>Mức cảnh báo dạng GeoJSON</a> <span>mở bằng QGIS, ArcGIS, Google Earth</span></li>
       <li><a href="data/luu_tru/canhbao_lich_su.csv" download>Lịch sử cảnh báo hằng ngày (CSV)</a> <span>để tính tỷ lệ bắt đúng, báo nhầm</span></li>
       <li><a href="data/vetinh.json">Kết quả vệ tinh (JSON)</a> <span>mưa GSMaP/IMERG, thay đổi Sentinel-1/2</span></li>
+      <li><a href="data/nhay_cam.json">Bản đồ vùng nguy cơ trượt lở (JSON + ảnh PNG)</a> <span>4 lớp trong hành lang 2 km quanh tuyến, mở bằng QGIS theo tọa độ góc ảnh</span></li>
       <li><a href="data/insar.json">Dịch chuyển mặt đất InSAR (JSON)</a> <span>tốc độ Sentinel-1 theo điểm dự báo, vùng dịch chuyển</span></li>
     </ul>
     <p class="note">Nguồn: dự báo Open-Meteo (CC BY 4.0) gồm ECMWF IFS và NOAA GFS; mưa vệ tinh JAXA GSMaP, NASA GPM IMERG;
@@ -318,6 +320,8 @@ const offLayer = L.layerGroup().addTo(map);
 DATA.official.forEach(o=>L.marker([o.xy[1],o.xy[0]],{icon:L.divIcon({className:'',html:'<div class="tri"></div>',iconSize:[16,14],iconAnchor:[8,10]})})
   .bindPopup('<div class="pop"><b>'+o.ten+'</b><br>Điểm nguy cơ cao (Cục Đường bộ, 17/12/2025)</div>').addTo(offLayer));
 const satLayer = L.layerGroup().addTo(map);
+map.createPane('ncPane').style.zIndex=350;     // dưới tuyến và điểm
+const ncLayer = L.layerGroup().addTo(map);      // bản đồ vùng nguy cơ trượt lở (AI hoặc độ dốc), ảnh PNG theo ô
 const insarLayer = L.layerGroup();               // ảnh tốc độ InSAR + vùng dịch chuyển (bật khi có kết quả)
 const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
   {maxZoom:17,attribution:'© OpenStreetMap, SRTM | Kiểu bản đồ © OpenTopoMap (CC BY-SA)'});
@@ -353,7 +357,7 @@ function snapXY(s){                               // điểm dự báo trên tuy
   return bd<(0.004**2)?best:s.xy;
 }
 L.control.layers({'Bản đồ nền':osm,'Địa hình':topo,'Ảnh vệ tinh':sat},
-  {'Điểm dự báo':stLayer,'Điểm trượt đã điều tra':lsLayer,'Điểm nguy cơ Cục ĐB':offLayer,'Thay đổi phát hiện từ vệ tinh':satLayer,'Dịch chuyển InSAR (mm/năm)':insarLayer},{collapsed:true}).addTo(map);
+  {'Điểm dự báo':stLayer,'Điểm trượt đã điều tra':lsLayer,'Điểm nguy cơ Cục ĐB':offLayer,'Thay đổi phát hiện từ vệ tinh':satLayer,'Dịch chuyển InSAR (mm/năm)':insarLayer,'Vùng nguy cơ trượt lở':ncLayer},{collapsed:true}).addTo(map);
 map.fitBounds(L.latLngBounds(DATA.zones.flatMap(z=>z.line.map(p=>[p[1],p[0]]))).pad(0.15));
 
 /* ---------- Tính cảnh báo ---------- */
@@ -458,6 +462,29 @@ function renderSat(){
   box.innerHTML=h;
   const ul=document.getElementById('sat-list');
   if(ul) ul.querySelectorAll('li').forEach(li=>li.onclick=()=>{const x=list[+li.dataset.i];map.setView([x.v.xy[1],x.v.xy[0]],15);});
+}
+/* ---------- Bản đồ vùng nguy cơ trượt lở (job AI hằng tuần trên Earth Engine) ---------- */
+let NCBD = null;
+async function loadNhayCam(){
+  try{ const r=await fetch('data/nhay_cam.json',{cache:'no-store'}); if(r.ok) NCBD=await r.json(); }catch(_){}
+  renderNhayCam();
+}
+function renderNhayCam(){
+  const el=document.getElementById('nc-note'); ncLayer.clearLayers(); const B=NCBD;
+  if(!B||!(B.anh||[]).length){ if(el) el.innerHTML=''; return; }
+  B.anh.forEach(a=>L.imageOverlay('data/'+a.tep,a.bien,{opacity:.5,interactive:false,className:'nc-anh',pane:'ncPane'}).addTo(ncLayer));
+  const ng=B.nguong||[], dv=B.loai==='ai'?'':'°', f=v=>fmtVN(v,B.loai==='ai'?1:0)+dv;
+  const kh=[(B.loai==='ai'?'p ':'')+'&lt; '+f(ng[0]), f(ng[0])+'–'+f(ng[1]), f(ng[1])+'–'+f(ng[2]), '≥ '+f(ng[2])];
+  if(!el) return;
+  el.innerHTML='<p class="note" style="margin-bottom:4px"><b>Bản đồ vùng nguy cơ trượt lở</b> (lớp “Vùng nguy cơ trượt lở”, hành lang '+fmtVN(B.hanh_lang_m/1000,0)+' km mỗi bên tuyến, cập nhật '+
+    fmtD(B.cap_nhat)+'/'+B.cap_nhat.slice(0,4)+'): '+(B.loai==='ai'?
+      'xác suất nhạy cảm từ mô hình AI '+B.mo_hinh+' học từ '+(B.nguon_mau||'điểm trượt')+' (AUC kiểm định chéo không gian '+fmtVN(B.auc_cv,2)+
+      (B.auc_diem_dieu_tra!=null?', trên điểm trượt điều tra độc lập '+fmtVN(B.auc_diem_dieu_tra,2):'')+').':
+      'theo độ dốc địa hình (DEM 30 m) – cách tạm dùng trong cảnh báo vì '+(B.ly_do||'chưa có mô hình AI đạt kiểm định')+'.')+'</p>'+
+    '<div class="legend" style="margin-top:0">'+B.lop.map((t,i)=>'<span><i style="background:'+B.mau[i]+';opacity:.75;border-radius:2px"></i>'+t[0].toUpperCase()+t.slice(1)+
+      ' <small>('+kh[i]+(B.ty_le&&B.ty_le[t]!=null?'; '+fmtVN(B.ty_le[t],0)+'% diện tích':'')+')</small></span>').join('')+'</div>'+
+    '<p class="note" style="margin-top:2px">Vùng nguy cơ là mức dễ sạt của sườn dốc khi gặp mưa lớn, không đổi theo ngày; '+(QD18?'cấp rủi ro từng ngày (QĐ 18/2021) ghép vùng nguy cơ với mưa dự báo và hiện ở các điểm dự báo.':
+      'mức cảnh báo từng ngày hiện ở các điểm dự báo.')+'</p>';
 }
 /* ---------- InSAR Sentinel-1 (job GitHub Actions + ASF HyP3, chuỗi SBAS) ---------- */
 let INSAR = null;
@@ -823,7 +850,7 @@ async function run(){
   const btn=document.getElementById('btn-refresh'); btn.disabled=true; btn.textContent='Đang cập nhật…';
   if(!loadRoad.done){ loadRoad.done=true; await loadRoad(); }
   await loadServer(); renderFSMethod(); renderAI();
-  await loadSat(); loadInsar();
+  await loadSat(); loadInsar(); loadNhayCam();
   try{
     RESULT=await fetchForecast(); setDay(DAY);
     if(REPLAY){ renderStatus(); showEvents(); }

@@ -1,6 +1,6 @@
 // Bản quyền © 2026 PGS. TS. Nguyễn Châu Lân, Trường Đại học Giao thông vận tải. Bảo lưu mọi quyền – xem LICENSE.
 // Service worker: mở được app khi mất mạng (hiện dự báo lần cuối), cập nhật khi có mạng.
-const CACHE = "ql6-v17";
+const CACHE = "ql6-v18";
 const SHELL = ['./', './index.html', './on_dinh.js', './danh_gia_anh.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
   './vendor/leaflet/leaflet.js', './vendor/leaflet/leaflet.css',
   './vendor/leaflet/images/layers.png', './vendor/leaflet/images/layers-2x.png', './chinh-sach-rieng-tu.html'];
