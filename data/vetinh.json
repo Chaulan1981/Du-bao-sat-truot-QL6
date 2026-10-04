@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
- "updated": "2026-10-04 11:05",
-=======
- "updated": "2026-10-04 11:09",
->>>>>>> 4d91513 (Cap nhat ve tinh 2026-10-04T04:29Z)
+ "updated": "2026-10-04 11:30",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -515,7 +511,7 @@
     "Km124+300": 62
    },
    "S1": {
-    "ngay": "2026-09-24 18:05",
+    "ngay": "2026-10-04 05:50",
     "chieu": "đi lên + đi xuống",
     "ve_tinh": "Sentinel-1D",
     "cac_luot": [
@@ -535,19 +531,31 @@
       "chieu": "đi xuống",
       "quy_dao": 91,
       "ve_tinh": "Sentinel-1D",
-      "ngay": "2026-09-22 05:50",
+      "ngay": "2026-10-04 05:50",
       "so_anh_nen": 4,
-      "tong_ha": 0.0,
+      "tong_ha": 0.56,
       "lech_chung_dB": {
-       "VH": -0.32,
-       "VV": -0.19
+       "VH": -0.31,
+       "VV": -0.28
       }
      }
     ],
     "so_anh_nen": 4,
     "hanh_lang_ha": 1411.0,
-    "tong_ha": 0.0,
-    "vung": [],
+    "tong_ha": 0.56,
+    "vung": [
+     {
+      "xy": [
+       105.07466,
+       20.69412
+      ],
+      "ha": 0.56,
+      "cach_duong_m": 166,
+      "dVH_dB": 4.1,
+      "chieu": "đi xuống",
+      "km": 128.03
+     }
+    ],
     "dien_rong": false
    },
    "S2": {
