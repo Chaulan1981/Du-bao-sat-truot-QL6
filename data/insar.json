@@ -1,1 +1,24 @@
-{"cap_nhat": "2026-10-03 22:41", "trang_thai": "chua_cau_hinh"}
+{
+ "cap_nhat": "2026-10-04 15:46",
+ "trang_thai": "chua_co_so_lieu",
+ "nguon": "Sentinel-1 (ESA Copernicus), giao thoa ASF HyP3 INSAR_ISCE_MULTI_BURST 80 m, chuỗi thời gian SBAS",
+ "quy_uoc": "Tốc độ theo hướng nhìn vệ tinh (LOS, mm/năm): dương = về phía vệ tinh, âm = ra xa",
+ "nguong": {
+  "chu_y": 10.0,
+  "dich_chuyen": 20.0,
+  "nhanh": 50.0
+ },
+ "chong": [
+  {
+   "ma": "T026A-QL6",
+   "trang_thai": "chua_co_so_lieu"
+  },
+  {
+   "ma": "T128A-KV1",
+   "trang_thai": "chua_co_so_lieu"
+  }
+ ],
+ "tram": {},
+ "diem_nong": [],
+ "anh": []
+}
