@@ -356,6 +356,9 @@ function levelOf(P,P10,isRock){
    QĐ 18/2021/QĐ-TTg Điều 46, khu vực 1 (Lào Cai, Yên Bái): mưa 100–200 / >200–400 / >400 mm/24 h kèm số ngày mưa trước
    và vùng nguy cơ (gần đúng theo độ dốc DEM); cộng ngưỡng thực nghiệm mưa tích lũy > 250 mm + mưa giờ > 40 mm (Nguyễn Châu Lân, 2024). */
 const NGUONG_MUA = DATA.nguong_mua || 'mai_chau', QD18 = NGUONG_MUA === 'qd18';
+const QD_NGAY_UOT = 5, QD_P_NH = 60, QD_E_NH = 250, QD_P_CY = 40, QD_E_CY = 200;
+const MO_HINH_MUA = DATA.mo_hinh_mua ? '&models='+DATA.mo_hinh_mua : '';     // Lào Cai: ECMWF IFS 0,25° (bắt nhiều vụ sạt 2026 hơn)
+function chuanMua(l){ const d=l.daily; if(d&&!d.precipitation_sum){ const k=Object.keys(d).find(k=>k.startsWith('precipitation_sum')); if(k) d.precipitation_sum=d[k]; } return l; }
 const QD_NGAY_MUA = 16, QD_TICH_LUY = 250, QD_GIO = 40, LOP_TXT = ['thấp','trung bình','cao','rất cao'];
 function lopNguyCo(beta){ return beta==null?2 : beta<15?0 : beta<25?1 : beta<35?2 : 3; }
 function capQD18(P,n,l){ let c=0;
@@ -367,8 +370,10 @@ function mucQD18(pr,t,l,hmax){
   let n=0; while(t-1-n>=0&&pr[t-1-n]>=QD_NGAY_MUA&&n<10) n++;
   let E=pr[t]; for(let j=t-1;j>=0&&pr[j]>=QD_NGAY_MUA;j--) E+=pr[j];
   const P=pr[t], cap=capQD18(P,n,l); let lv=cap; if(!cap&&P>=100) lv=1;
+  let E5=0; for(let j=t;j>=0&&pr[j]>=QD_NGAY_UOT;j--) E5+=pr[j];      // ngưỡng hiệu chỉnh 2026 (nguong_mua.py)
+  const tn=(P>=QD_P_NH||E5>=QD_E_NH)?2:(P>=QD_P_CY||E5>=QD_E_CY)?1:0, byTn=tn>lv; lv=Math.max(lv,tn);
   const tl=E>QD_TICH_LUY&&hmax!=null&&hmax>QD_GIO; if(tl) lv=3;
-  return {thr:100,ratio:P/100,lv,qd18:{cap,n,E,lop:l,hmax},byTL:tl};
+  return {thr:100,ratio:P/100,lv,qd18:{cap,n,E,lop:l,hmax,E5,tn},byTL:tl,byTn:byTn&&!tl};
 }
 function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return Math.min(3,lopNguyCo(g?g.doc:null)+(g&&g.nang?1:0)); }
 // Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới); gio: {ngày: mưa giờ lớn nhất}
@@ -524,9 +529,9 @@ async function fetchForecast(){
   const lat = st.map(s=>s.xy[1].toFixed(4)).join(','), lon = st.map(s=>s.xy[0].toFixed(4)).join(',');
   const url = REPLAY
     ? 'https://historical-forecast-api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
-      '&daily=precipitation_sum&start_date='+addDays(REPLAY,-PAST_DAYS-PAD_FS)+'&end_date='+addDays(REPLAY,3)+'&timezone=Asia%2FBangkok'
+      '&daily=precipitation_sum&start_date='+addDays(REPLAY,-PAST_DAYS-PAD_FS)+'&end_date='+addDays(REPLAY,3)+'&timezone=Asia%2FBangkok'+MO_HINH_MUA
     : 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
-      '&daily=precipitation_sum&past_days='+(PAST_DAYS+PAD_FS)+'&forecast_days=4&timezone=Asia%2FBangkok';
+      '&daily=precipitation_sum&past_days='+(PAST_DAYS+PAD_FS)+'&forecast_days=4&timezone=Asia%2FBangkok'+MO_HINH_MUA;
   const ensP = REPLAY ? Promise.resolve(null) : fetchEnsemble(st);   // tổ hợp chỉ có cho dự báo hiện tại
   const gioP = QD18 ? fetch(REPLAY
       ? 'https://historical-forecast-api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=precipitation&start_date='+addDays(REPLAY,-3)+'&end_date='+addDays(REPLAY,3)+'&timezone=Asia%2FBangkok'
@@ -535,7 +540,7 @@ async function fetchForecast(){
     : Promise.resolve(null);
   const r = await fetch(url);
   if(!r.ok) throw new Error('Máy chủ Open-Meteo trả lỗi '+r.status);
-  let j = await r.json(); if(!Array.isArray(j)) j=[j];
+  let j = await r.json(); if(!Array.isArray(j)) j=[j]; j=j.map(chuanMua);
   const GIO = await gioP;
   const res = st.map((s,i)=>{
     const d = j[i].daily, prF = d.precipitation_sum.map(v=>v||0), tmF = d.time;
@@ -649,9 +654,12 @@ function qd18Rows(d){ const q=d.qd18, r=(a,b)=>'<tr><td>'+a+'</td><td>'+b+'</td>
   return r('Ngày mưa liền trước','≥ 16 mm: '+q.n+' ngày')+r('Mưa tích lũy đợt',q.E.toFixed(0)+' mm')+
     (q.hmax!=null?r('Mưa giờ lớn nhất',q.hmax.toFixed(1)+' mm'):'')+r('Vùng nguy cơ (theo độ dốc)',LOP_TXT[q.lop])+
     r('Rủi ro QĐ 18/2021',q.cap?'<b>cấp '+q.cap+'</b> (khu vực 1)':(d.P>=100?'mưa ≥ 100 mm nhưng chưa có ngày mưa trước':'dưới cấp 1'))+
+    (q.E5!=null?r('Mưa đợt (ngày ≥ 5 mm)',q.E5.toFixed(0)+' mm'):'')+
+    (q.tn?r('Ngưỡng hiệu chỉnh 2026','<b>'+(q.tn>=2?'Nguy hiểm':'Cần chú ý')+'</b> (≥ '+(q.tn>=2?QD_P_NH+' mm/ngày hoặc ≥ '+QD_E_NH:QD_P_CY+' mm/ngày hoặc ≥ '+QD_E_CY)+' mm/đợt)'):'')+
     (d.byTL?r('Ngưỡng tích lũy','<b>vượt</b> 250 mm + 40 mm/h'):''); }
 function qd18Txt(x){ const q=x.qd18;
   if(x.byTL) return 'Mưa tích lũy '+q.E.toFixed(0)+' mm và mưa giờ '+q.hmax.toFixed(0)+' mm vượt ngưỡng 250 mm + 40 mm/h';
+  if(x.byTn) return 'Mưa '+x.P.toFixed(0)+' mm/ngày, mưa đợt '+q.E5.toFixed(0)+' mm – vượt ngưỡng hiệu chỉnh 2026 ('+(q.tn>=2?'≥ '+QD_P_NH+' mm/ngày hoặc ≥ '+QD_E_NH+' mm/đợt':'≥ '+QD_P_CY+' mm/ngày hoặc ≥ '+QD_E_CY+' mm/đợt')+')';
   return 'Mưa '+x.P.toFixed(0)+' mm/24 h sau '+q.n+' ngày mưa, vùng nguy cơ '+LOP_TXT[q.lop]+(q.cap?' → rủi ro cấp '+q.cap+' (QĐ 18/2021)':''); }
 function reasonTxt(x){
   if(x.byPersist) return persistTxt(x);

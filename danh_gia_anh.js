@@ -105,10 +105,10 @@
   async function muaVaOnDinh(lat, lon, beta, laDa) {
     const q = 'latitude=' + lat.toFixed(4) + '&longitude=' + lon.toFixed(4) + '&daily=precipitation_sum&timezone=Asia%2FBangkok';
     const [rf, re] = await Promise.all([
-      fetch('https://api.open-meteo.com/v1/forecast?' + q + '&past_days=' + (PAST_DAYS + PAD_FS) + '&forecast_days=4'),
+      fetch('https://api.open-meteo.com/v1/forecast?' + q + '&past_days=' + (PAST_DAYS + PAD_FS) + '&forecast_days=4' + (typeof MO_HINH_MUA === 'string' ? MO_HINH_MUA : '')),
       fetch('https://ensemble-api.open-meteo.com/v1/ensemble?' + q + '&forecast_days=4&models=' + ENS_MODELS).catch(() => null)]);
     if (!rf.ok) throw new Error('Không lấy được mưa dự báo');
-    const d = (await rf.json()).daily, prF = d.precipitation_sum.map(v => v || 0), tmF = d.time, off = prF.length - (PAST_DAYS + 4);
+    const d = chuanMua(await rf.json()).daily, prF = d.precipitation_sum.map(v => v || 0), tmF = d.time, off = prF.length - (PAST_DAYS + 4);
     const lop = QD18 ? lopNguyCo(beta) : null;
     const pr = prF.slice(off), tm = tmF.slice(off), days = evalStation(pr, tm, laDa, lop, null);
     let ens = null; try { if (re && re.ok) ens = await re.json(); } catch (_) {}
