@@ -197,7 +197,8 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       1) <b>Quyết định 18/2021/QĐ-TTg, Điều 46</b> – Lào Cai, Yên Bái thuộc khu vực 1. Mưa 100–200 mm/24 h sau 1–2 ngày mưa: vùng nguy cơ thấp, trung bình → cấp 1; cao → cấp 2; rất cao → cấp 3.
       Mưa trên 200–400 mm/24 h sau hơn 2 ngày mưa: thấp → cấp 1; trung bình → cấp 2; cao, rất cao → cấp 3. Mưa trên 400 mm/24 h sau hơn 2 ngày mưa: thấp, trung bình → cấp 2; cao, rất cao → cấp 3.
       Trên trang: cấp 1 = Cần chú ý, cấp 2 = Nguy hiểm, cấp 3 = Đạt ngưỡng trượt; “ngày mưa” là ngày có mưa từ 16 mm (mưa vừa trở lên);
-      vùng nguy cơ lấy gần đúng theo độ dốc địa hình (dưới 15° thấp, 15–25° trung bình, 25–35° cao, từ 35° rất cao) khi chưa có bản đồ phân vùng chính thức; điểm dự báo có điểm sạt trượt đã điều tra (cấp rủi ro 2–3) trong bán kính 1 km hoặc có dịch chuyển InSAR từ 20 mm/năm được nâng vùng nguy cơ lên một bậc;
+      vùng nguy cơ lấy theo bản đồ nhạy cảm trượt lở bằng AI (Random Forest học từ các điểm sạt trượt đã điều tra; xem Chú giải), khi chưa có thì gần đúng theo độ dốc địa hình
+      (dưới 15° thấp, 15–25° trung bình, 25–35° cao, từ 35° rất cao); điểm dự báo có điểm sạt trượt đã điều tra (cấp rủi ro 2–3) trong bán kính 1 km hoặc có dịch chuyển InSAR từ 20 mm/năm được nâng vùng nguy cơ lên một bậc;
       mưa từ 100 mm nhưng chưa có ngày mưa trước → Cần chú ý.<br>
       2) <b>Ngưỡng thực nghiệm</b> từ các trận Liên Minh (Sa Pa, 2023) và Làng Nủ (Bảo Yên, 2024): mưa 1 giờ trên 40 mm và mưa tích lũy trên 250 mm có thể gây trượt lở, lũ bùn đá
       (Nguyễn Châu Lân, Tuổi Trẻ 03/10/2024) → Đạt ngưỡng trượt; mưa giờ lấy từ dự báo theo giờ của Open-Meteo.<br>
@@ -205,6 +206,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       mưa ngày từ 60 mm hoặc mưa đợt (các ngày liền nhau từ 5 mm) từ 250 mm → Nguy hiểm; mưa ngày từ 40 mm hoặc mưa đợt từ 200 mm → Cần chú ý.
       Các ngày đã qua dùng mưa lớn hơn giữa ECMWF và mưa vệ tinh IMERG (GSMaP khi IMERG chưa về đủ; vệ tinh hiện về chậm khoảng 2 ngày).
       Mức cuối là mức cao nhất trong ba cách trên và hệ số an toàn FS.</p>
+    <p class="note" id="ai-note"></p>
     <p class="note">Hệ số an toàn mái dốc FS tính theo nước mưa ngấm dần vào đất và lực hút dính mất đi khi đất ướt (SWCC):
       FS &lt; 1,2 nâng lên Nguy hiểm, FS &lt; 1 lên Đạt ngưỡng trượt. Cách này bắt được cả đợt mưa kéo dài nhiều ngày mà từng ngày đều dưới ngưỡng.</p>
   </section>
@@ -294,12 +296,24 @@ const PERSIST_DAYS = 7;   // duy trì cảnh báo sau ngày mưa vượt ngưỡ
 const PAST_DAYS = 17;     // 10 ngày tính P10 + 7 ngày duy trì
 const PAD_FS = 28;        // thêm 28 ngày mưa trước đó cho mô hình ổn định mái (nước thấm tích lũy)
 let DH = null;            // độ dốc từng điểm (DEM Copernicus 30 m) lấy từ kết quả job tự động data/alerts.json
+let AI_TT=null;                                   // tóm tắt mô hình AI nhạy cảm (alerts.json)
+function aiCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return g&&g.ai?g.ai:null; }
+function renderAI(){                              // tóm tắt mô hình AI nhạy cảm trượt lở
+  const el=document.getElementById('ai-note'); if(!el) return; const a=AI_TT;
+  el.innerHTML=a?'<b>Nhạy cảm trượt lở bằng AI:</b> '+a.mo_hinh+' học từ '+a.so_diem_truot+' điểm trượt đã điều tra và '+a.so_diem_khong+
+    ' điểm không trượt với 16 lớp địa hình, thủy văn, thổ nhưỡng, thực phủ, mưa năm; kiểm định '+a.kiem_dinh+': AUC '+fmtVN(a.auc_cv||0,2)+
+    ' (cập nhật '+fmtD(a.cap_nhat)+'/'+a.cap_nhat.slice(0,4)+'). '+(QD18?'Xác suất nhạy cảm quanh điểm dự báo quyết định vùng nguy cơ của QĐ 18/2021 (&lt; 0,3 thấp; 0,3–0,5 trung bình; 0,5–0,7 cao; ≥ 0,7 rất cao).':
+    'Xác suất nhạy cảm hiển thị trong thông tin từng điểm dự báo.'):''; }
+function aiRows(s){ const a=aiCua(s); if(!a) return '';
+  return '<table><tr><td>Nhạy cảm trượt lở (AI)</td><td><b>'+fmtVN(a.p,2)+'</b> – '+LOP_TXT[a.lop]+(AI_TT&&AI_TT.auc_cv?' <small>(Random Forest, AUC '+fmtVN(AI_TT.auc_cv,2)+')</small>':'')+'</td></tr></table>'; }
 async function loadServer(){
   if(DH) return;
   try{ const r=await fetch('data/alerts.json',{cache:'no-store'}); const sv=r.ok?await r.json():null; const diem={};
     (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta};
       if(x.lop_nang) (diem[x.id]=diem[x.id]||{}).nang=1;
-      if(x.truot_sau) (diem[x.id]=diem[x.id]||{}).sau=x.truot_sau; });   // hình học trượt sâu (β P75, chiều cao sườn)   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
+      if(x.truot_sau) (diem[x.id]=diem[x.id]||{}).sau=x.truot_sau;    // hình học trượt sâu (β P75, chiều cao sườn)
+      if(x.nhay_cam) (diem[x.id]=diem[x.id]||{}).ai=x.nhay_cam; });  // AI nhạy cảm (Random Forest)
+    if(sv&&sv.nhay_cam) AI_TT=sv.nhay_cam;   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
     if(Object.keys(diem).length) DH={nguon:'DEM Copernicus 30 m',diem};
   }catch(_){}
 }
@@ -398,7 +412,7 @@ function mucQD18(pr,t,l,hmax){
   const tl=E>QD_TICH_LUY&&hmax!=null&&hmax>QD_GIO; if(tl) lv=3;
   return {thr:100,ratio:P/100,lv,qd18:{cap,n,E,lop:l,hmax,E5,tn},byTL:tl,byTn:byTn&&!tl};
 }
-function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return Math.min(3,lopNguyCo(g?g.doc:null)+(g&&g.nang?1:0)); }
+function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return Math.min(3,(g&&g.ai?g.ai.lop:lopNguyCo(g?g.doc:null))+(g&&g.nang?1:0)); }
 // Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới); gio: {ngày: mưa giờ lớn nhất}
 function evalStation(pr, times, isRock, lop, gio){
   const sum=(a,b)=>pr.slice(a,b).reduce((x,y)=>x+y,0);
@@ -652,7 +666,7 @@ function renderMap(){
     const xy=snapXY(s);
     L.circleMarker([xy[1],xy[0]],{radius:s.type==='da'?9:7,color:'#fff',weight:2,fillColor:LV_COL[d.lv],fillOpacity:1})
      .bindPopup('<div class="pop"><b>'+s.id+'</b><br>'+DAY_TXT[DAY]+' ('+d.date+')<br><b style="color:'+LV_COL[d.lv]+'">'+LV_TXT[d.lv]+'</b>'+
-       '<table><tr><td>Mưa ngày P</td><td>'+d.P.toFixed(1)+' mm</td></tr>'+(d.qd18?qd18Rows(d):
+       '<table><tr><td>Mưa ngày P</td><td>'+d.P.toFixed(1)+' mm</td></tr>'+(d.qd18?qd18Rows(d,s):
        '<tr><td>Mưa 10 ngày trước</td><td>'+d.P10.toFixed(0)+' mm</td></tr>'+
        '<tr><td>Ngưỡng Mai Châu</td><td>'+d.thr.toFixed(0)+' mm</td></tr><tr><td>Tỷ số P/ngưỡng</td><td>'+d.ratio.toFixed(2)+'</td></tr>')+
        (s.satDays?'<tr><td>Mưa vệ tinh</td><td>dùng cho '+s.satDays+' ngày</td></tr>':'')+
@@ -670,7 +684,7 @@ function renderMap(){
        (d.fsSau?'<table><tr><td colspan="2"><b>Trượt sâu (Bishop, nước ngầm)</b></td></tr>'+
               '<tr><td>Hệ số an toàn FS sâu</td><td><b style="color:'+(d.fsSauLv===1?'#7a5d00':LV_COL[d.fsSauLv])+'">'+fmtVN(d.fsSau.FS,2)+'</b></td></tr>'+
               '<tr><td>Nước ngầm dâng</td><td>'+Math.round(d.fsSau.m*100)+'% tầng phủ '+fmtVN(OD.CAU_HINH.sau.Dd,0)+' m</td></tr>'+
-              '<tr><td>Sườn dốc (P75) / cao</td><td>'+fmtVN(s.sau.beta,0)+'° / '+fmtVN(s.sau.H,0)+' m ('+s.sau.nguon+')</td></tr></table>':'')+insarRows(s)+
+              '<tr><td>Sườn dốc (P75) / cao</td><td>'+fmtVN(s.sau.beta,0)+'° / '+fmtVN(s.sau.H,0)+' m ('+s.sau.nguon+')</td></tr></table>':'')+insarRows(s)+aiRows(s)+
        (d.byEns?'<br><b>Mức nâng theo dự báo tổ hợp.</b>':'')+
        (d.byFs?'<br><b>Mức nâng theo hệ số an toàn mái dốc.</b>':'')+
        (d.bySau?'<br><b>Mức nâng theo nguy cơ trượt sâu (nước ngầm dâng sau mưa kéo dài).</b>':'')+
@@ -682,9 +696,9 @@ function fsTxt(x){
   return 'Hệ số an toàn mái FS '+fmtVN(x.fs.FS,2)+' (đới ngấm '+fmtVN(x.fs.h,1)+' m'+(x.fs.hw>0?', nước treo '+fmtVN(x.fs.hw,1)+' m':'')+')'+
     (x.fsEns?', '+Math.round(x.fsEns.p1*100)+'% kịch bản FS < 1':'');
 }
-function qd18Rows(d){ const q=d.qd18, r=(a,b)=>'<tr><td>'+a+'</td><td>'+b+'</td></tr>';
+function qd18Rows(d,s){ const q=d.qd18, r=(a,b)=>'<tr><td>'+a+'</td><td>'+b+'</td></tr>';
   return r('Ngày mưa liền trước','≥ 16 mm: '+q.n+' ngày')+r('Mưa tích lũy đợt',q.E.toFixed(0)+' mm')+
-    (q.hmax!=null?r('Mưa giờ lớn nhất',q.hmax.toFixed(1)+' mm'):'')+r('Vùng nguy cơ (theo độ dốc)',LOP_TXT[q.lop])+
+    (q.hmax!=null?r('Mưa giờ lớn nhất',q.hmax.toFixed(1)+' mm'):'')+r('Vùng nguy cơ ('+(s&&aiCua(s)?'AI':'theo độ dốc')+')',LOP_TXT[q.lop])+
     r('Rủi ro QĐ 18/2021',q.cap?'<b>cấp '+q.cap+'</b> (khu vực 1)':(d.P>=100?'mưa ≥ 100 mm nhưng chưa có ngày mưa trước':'dưới cấp 1'))+
     (q.E5!=null?r('Mưa đợt (ngày ≥ 5 mm)',q.E5.toFixed(0)+' mm'):'')+
     (q.tn?r('Ngưỡng hiệu chỉnh 2026','<b>'+(q.tn>=2?'Nguy hiểm':'Cần chú ý')+'</b> (≥ '+(q.tn>=2?QD_P_NH+' mm/ngày hoặc ≥ '+QD_E_NH:QD_P_CY+' mm/ngày hoặc ≥ '+QD_E_CY)+' mm/đợt)'):'')+
@@ -831,7 +845,7 @@ function notify(w){
 async function run(){
   const btn=document.getElementById('btn-refresh'); btn.disabled=true; btn.textContent='Đang cập nhật…';
   if(!loadRoad.done){ loadRoad.done=true; await loadRoad(); }
-  await loadServer(); renderFSMethod();
+  await loadServer(); renderFSMethod(); renderAI();
   await loadSat(); loadInsar();
   try{
     RESULT=await fetchForecast(); setDay(DAY);
