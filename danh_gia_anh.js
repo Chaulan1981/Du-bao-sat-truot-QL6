@@ -131,6 +131,10 @@
         if (fe && fe[k]) { o.fsEns = fe[k]; const pl = OD.mucXacSuat(fe[k], P_HI, P_MID); if (pl >= 2 && pl > o.lv) { o.lv = pl; o.byFs = true; } }
       });
       od = {beta: p.beta_tinh, D: p.D, FSkho: OD.fsKho(p)};
+      const sau = OD.chuoiFSSau ? OD.chuoiFSSau(prF, beta, OD.hinhHocSau({}).H) : null;      // trượt sâu tại điểm ảnh
+      if (sau) { chart.FS_sau = sau.slice(a0).map(x => x.FS); od.sau = {beta, H: OD.hinhHocSau({}).H, nguon: 'góc mái ảnh/DEM'};
+        days.forEach((o, k) => { o.fsSau = sau[off + PAST_DAYS + k]; o.fsSauLv = OD.mucFSSau(o.fsSau.FS);
+          if (o.fsSauLv >= 2 && o.fsSauLv > o.lv) { o.lv = o.fsSauLv; o.bySau = true; } }); }
     }
     return {days, od, chart, nEns: m.cols.length};
   }
@@ -203,7 +207,9 @@
     if (r.laDa) h += hang('Ổn định', 'Mái đá' + (r.loai === 'tu' ? ' (nhận từ ảnh)' : '') + ': mô hình đất theo mưa không áp dụng; ổn định vách đá do hệ khe nứt quyết định – cần đo thế nằm khe nứt tại hiện trường để phân tích động học.');
     else h += hang('Hệ số an toàn FS', '<b style="color:' + (d0.fsLv === 1 ? '#7a5d00' : LV_COL[d0.fsLv]) + '">' + fmtVN(f.FS, 2) + '</b> hôm nay (khô ' + fmtVN(o.FSkho, 2) + '); 3 ngày tới: ' +
         r.md.days.slice(1).map(x => fmtVN(x.fs.FS, 2) + (x.fsEns ? ' (' + Math.round(x.fsEns.p1 * 100) + '% FS&lt;1)' : '')).join(' · ')) +
-      hang('Thông số tính', 'góc mái ' + fmtVN(r.beta, 0) + '° (' + r.nguonGoc + '), tầng phủ ' + fmtVN(o.D, 1) + ' m, đới ngấm ' + fmtVN(f.h, 1) + ' m' + (f.hw > 0 ? ', nước treo ' + fmtVN(f.hw, 1) + ' m' : ''));
+      hang('Thông số tính', 'góc mái ' + fmtVN(r.beta, 0) + '° (' + r.nguonGoc + '), tầng phủ ' + fmtVN(o.D, 1) + ' m, đới ngấm ' + fmtVN(f.h, 1) + ' m' + (f.hw > 0 ? ', nước treo ' + fmtVN(f.hw, 1) + ' m' : '')) +
+      (d0.fsSau ? hang('Trượt sâu', 'FS <b style="color:' + (d0.fsSauLv === 1 ? '#7a5d00' : LV_COL[d0.fsSauLv]) + '">' + fmtVN(d0.fsSau.FS, 2) + '</b> hôm nay, nước ngầm dâng ' +
+        Math.round(d0.fsSau.m * 100) + '% tầng phủ; 3 ngày tới: ' + r.md.days.slice(1).map(x => fmtVN(x.fsSau.FS, 2)).join(' · ')) : '');
     h += hang('Từ ảnh', 'thực vật ' + r.anh.tv + '%, đất ' + r.anh.dat + '%, đá/đất sáng ' + r.anh.sang + '%, bóng tối ' + r.anh.toi + '%') + '</table>';
     if (r.anh.ghiChu.length) h += '<ul class="anh-gc">' + r.anh.ghiChu.map(x => '<li>' + x + '</li>').join('') + '</ul>';
     if (!r.laDa && r.md.chart) h += fsSvg(r.md.chart, 0);

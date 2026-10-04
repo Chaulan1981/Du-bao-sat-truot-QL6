@@ -276,7 +276,8 @@ async function loadServer(){
   if(DH) return;
   try{ const r=await fetch('data/alerts.json',{cache:'no-store'}); const sv=r.ok?await r.json():null; const diem={};
     (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta};
-      if(x.lop_nang) (diem[x.id]=diem[x.id]||{}).nang=1; });   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
+      if(x.lop_nang) (diem[x.id]=diem[x.id]||{}).nang=1;
+      if(x.truot_sau) (diem[x.id]=diem[x.id]||{}).sau=x.truot_sau; });   // hình học trượt sâu (β P75, chiều cao sườn)   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
     if(Object.keys(diem).length) DH={nguon:'DEM Copernicus 30 m',diem};
   }catch(_){}
 }
@@ -556,6 +557,9 @@ async function fetchForecast(){
       o.odp=p; o.od={beta:p.beta_tinh,nguon:p.nguon_doc,D:p.D,FSkho:OD.fsKho(p)};
       o.fsChart={t:tmF.slice(a0),P:prF.slice(a0),FS:ser.slice(a0).map(x=>x.FS),nguong:p.nguong};
       o.days.forEach((dd,k)=>{ dd.fs=ser[off+PAST_DAYS+k]; dd.fsLv=OD.mucFS(dd.fs.FS,p); });
+      const g=DH&&DH.diem&&DH.diem[s.id], hh=OD.hinhHocSau(g&&g.sau?g.sau:g), sau=OD.chuoiFSSau(prF,hh.beta,hh.H);   // trượt sâu
+      if(sau){ o.sau=hh; o.fsChart.FS_sau=sau.slice(a0).map(x=>x.FS);
+        o.days.forEach((dd,k)=>{ dd.fsSau=sau[off+PAST_DAYS+k]; dd.fsSauLv=OD.mucFSSau(dd.fsSau.FS); }); }
     }
     return o;
   });
@@ -572,6 +576,7 @@ async function fetchForecast(){
   res.forEach(s=>{                                            // nâng mức theo ổn định mái: chỉ từ mức Nguy hiểm trở lên
     if(s.odp) s.days.forEach((o,k)=>{
       if(o.fsLv>=2&&o.fsLv>o.lv){ o.lv=o.fsLv; o.byFs=true; }
+      if(o.fsSauLv>=2&&o.fsSauLv>o.lv){ o.lv=o.fsSauLv; o.bySau=true; }
       const fe=s.fsE&&s.fsE[k]; if(fe){ o.fsEns=fe; const pl=OD.mucXacSuat(fe,P_HI,P_MID); if(pl>=2&&pl>o.lv){ o.lv=pl; o.byFs=true; } }
     });
     ['pr','time','prF','tmF','odp','fsE','off'].forEach(k=>delete s[k]);
@@ -639,9 +644,14 @@ function renderMap(){
               '<tr><td>Lực hút dính</td><td>'+(d.fs.psi>0?fmtVN(d.fs.psi,0)+' kPa':'đã mất (đất ngấm nước)')+'</td></tr>'+
               '<tr><td>Độ dốc mái</td><td>'+fmtVN(s.od.beta,0)+'° ('+s.od.nguon+')</td></tr>'+
               (d.fsEns?'<tr><td>Xác suất FS &lt; 1</td><td><b>'+Math.round(d.fsEns.p1*100)+'%</b>; FS 10–50–90%: '+fmtVN(d.fsEns.FS10,2)+' – '+fmtVN(d.fsEns.FS50,2)+' – '+fmtVN(d.fsEns.FS90,2)+'</td></tr>':'')+
-              '</table>'+fsSvg(s.fsChart,DAY):'')+insarRows(s)+
+              '</table>'+fsSvg(s.fsChart,DAY):'')+
+       (d.fsSau?'<table><tr><td colspan="2"><b>Trượt sâu (Bishop, nước ngầm)</b></td></tr>'+
+              '<tr><td>Hệ số an toàn FS sâu</td><td><b style="color:'+(d.fsSauLv===1?'#7a5d00':LV_COL[d.fsSauLv])+'">'+fmtVN(d.fsSau.FS,2)+'</b></td></tr>'+
+              '<tr><td>Nước ngầm dâng</td><td>'+Math.round(d.fsSau.m*100)+'% tầng phủ '+fmtVN(OD.CAU_HINH.sau.Dd,0)+' m</td></tr>'+
+              '<tr><td>Sườn dốc (P75) / cao</td><td>'+fmtVN(s.sau.beta,0)+'° / '+fmtVN(s.sau.H,0)+' m ('+s.sau.nguon+')</td></tr></table>':'')+insarRows(s)+
        (d.byEns?'<br><b>Mức nâng theo dự báo tổ hợp.</b>':'')+
        (d.byFs?'<br><b>Mức nâng theo hệ số an toàn mái dốc.</b>':'')+
+       (d.bySau?'<br><b>Mức nâng theo nguy cơ trượt sâu (nước ngầm dâng sau mưa kéo dài).</b>':'')+
        (d.persist?'<br><b>'+persistTxt(d)+'</b>'+(d.byPersist?' – giữ mức Nguy hiểm tới hết '+PERSIST_DAYS+' ngày.':''):'')+
        (s.note?'<br><i>'+s.note+'</i>':'')+'</div>').addTo(stLayer);
   });
@@ -663,6 +673,7 @@ function qd18Txt(x){ const q=x.qd18;
   return 'Mưa '+x.P.toFixed(0)+' mm/24 h sau '+q.n+' ngày mưa, vùng nguy cơ '+LOP_TXT[q.lop]+(q.cap?' → rủi ro cấp '+q.cap+' (QĐ 18/2021)':''); }
 function reasonTxt(x){
   if(x.byPersist) return persistTxt(x);
+  if(x.bySau) return 'Trượt sâu: FS '+fmtVN(x.fsSau.FS,2)+', nước ngầm dâng '+Math.round(x.fsSau.m*100)+'% tầng phủ sau mưa kéo dài';
   if(x.byFs) return fsTxt(x)+'; mưa '+x.P.toFixed(0)+' mm';
   if(x.byEns) return Math.round(x.ens.p3*100)+'% trong '+x.ens.n+' kịch bản đạt ngưỡng trượt; mưa 90%: '+x.ens.P90.toFixed(0)+' mm (dự báo chính '+x.P.toFixed(0)+' mm)';
   if(x.s.type==='da'&&x.lv===1&&x.ratio<0.7) return 'Điểm đá đổ: luôn cần chú ý, kể cả khi không mưa';
@@ -721,9 +732,10 @@ function fsSvg(c,day){                          // FS 14 ngày qua + 4 ngày t�
   c.P.forEach((p,i)=>{ const h=(H-t-b)*0.45*p/pmax; g+='<rect x="'+(x(i)-wx*.35)+'" y="'+(H-b-h)+'" width="'+(wx*.7)+'" height="'+h+'" fill="#7FA7C9"><title>'+fmtD(c.t[i])+': mưa '+p.toFixed(0)+' mm</title></rect>'; });
   [[c.nguong[0],LV_COL[3]],[c.nguong[1],LV_COL[2]]].forEach(([f,col])=>{ g+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+y(f)+'" y2="'+y(f)+'" stroke="'+col+'" stroke-dasharray="3 3"/><text x="'+(l-3)+'" y="'+(y(f)+3)+'" font-size="9" text-anchor="end" fill="'+col+'">'+fmtVN(f,1)+'</text>'; });
   g+='<polyline fill="none" stroke="#1D2A30" stroke-width="2" points="'+c.FS.map((f,i)=>x(i).toFixed(1)+','+y(f).toFixed(1)).join(' ')+'"/>';
+  if(c.FS_sau) g+='<polyline fill="none" stroke="#A0622D" stroke-width="2" stroke-dasharray="5 3" points="'+c.FS_sau.map((f,i)=>x(i).toFixed(1)+','+y(f).toFixed(1)).join(' ')+'"><title>FS trượt sâu</title></polyline>';
   c.FS.forEach((f,i)=>{ g+='<circle cx="'+x(i)+'" cy="'+y(f)+'" r="'+(i===14+day?4:2)+'" fill="'+LV_COL[fsMuc(f,c.nguong)]+'"><title>'+fmtD(c.t[i])+': FS '+fmtVN(f,2)+'</title></circle>'; });
   g+='<text x="'+l+'" y="'+(H-4)+'" font-size="9" fill="#5B6A70">'+fmtD(c.t[0])+'</text><text x="'+x(14)+'" y="'+(H-4)+'" font-size="9" text-anchor="middle" fill="#5B6A70">hôm nay</text>';
-  return g+'</svg><small style="color:#5B6A70">Đường đen: FS; cột xanh: mưa ngày; nền xám: 4 ngày dự báo.</small>';
+  return g+'</svg><small style="color:#5B6A70">Đường đen: FS trượt nông'+(c.FS_sau?'; nét đứt nâu: FS trượt sâu':'')+'; cột xanh: mưa ngày; nền xám: 4 ngày dự báo.</small>';
 }
 function renderFS(){
   const el=document.getElementById('fs-strip'); if(!RESULT) return; let h='<div></div>';
@@ -749,6 +761,16 @@ function renderFS(){
     c.onclick=go; c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
   });
 }
+function sauMethod(C){                            // phương pháp trượt sâu (scripts/truot_sau.py)
+  const q=C.sau; if(!q) return '';
+  return '<p><b>Trượt sâu</b> (mặt trượt cung tròn, Bishop đơn giản hóa): mặt cắt chuẩn mỗi điểm gồm sườn dốc β (phân vị 75% độ dốc DEM trong 300 m) cao H (chênh cao trong 300 m, 15–80 m), '+
+    'tầng tàn tích–phong hóa dày '+fmtVN(q.Dd,0)+' m (c′ '+fmtVN(q.c,0)+' kPa, φ′ '+fmtVN(q.phi,0)+'°) trên đá gốc (c′ '+fmtVN(q.c_da,0)+' kPa, φ′ '+fmtVN(q.phi_da,0)+'°); '+
+    'chỉ xét cung có độ sâu ≥ '+fmtVN(q.Dd/2,0)+' m. Nước ngầm là hai bể nối tiếp (nước thấm qua đới chưa bão hòa rồi mới tới nước ngầm nên mực nước dâng trễ sau mưa): '+
+    'S<sub>t</sub> = '+fmtVN(q.k1,2)+'·S<sub>t−1</sub> + '+fmtVN(q.r,1)+'·P<sub>t</sub>, G<sub>t</sub> = '+fmtVN(q.k,2)+'·G<sub>t−1</sub> + '+fmtVN(1-q.k1,2)+'·S<sub>t−1</sub>, '+
+    'mặt nước cao m = G/(1000·D·'+fmtVN(q.ne,2)+') phần tầng phủ, u = γ<sub>w</sub>h·cos²β. Phân tích ngược: mái tồn tại với FS '+fmtVN(q.FS_ref,2)+' khi m = '+fmtVN(q.m_ref,2)+
+    ' ⇒ FS(t) = '+fmtVN(q.FS_ref,2)+'·FS<sub>Bishop</sub>(m<sub>t</sub>)/FS<sub>Bishop</sub>('+fmtVN(q.m_ref,2)+'). FS sâu &lt; '+fmtVN(C.sau_nguong[1],1)+' → Nguy hiểm, &lt; 1 → Đạt ngưỡng trượt; '+
+    'với mưa 2023–2026 FS sâu thấp nhất khoảng 1,16, xảy ra khoảng 2 tuần sau bão Yagi (9/2024). '+(C.sau_ghi_chu||'')+'</p>';
+}
 function renderFSMethod(){
   const C=(window.OD&&OD.CAU_HINH)||{mac_dinh:{}}, p=C.mac_dinh, ng=C.nguong_fs||[1,1.2,1.3];
   const nd=DH&&DH.diem?Object.keys(DH.diem).length:0, sw=OD.hutDinh(p.S0,p);
@@ -759,7 +781,7 @@ function renderFSMethod(){
     '<li>Lực hút dính ở phần đất chưa ngấm theo đường cong đặc trưng đất–nước (SWCC) van Genuchten: S<sub>e</sub> = (S<sub>0</sub>n − θ<sub>r</sub>)/(n − θ<sub>r</sub>), ψ = [S<sub>e</sub><sup>−1/m</sup> − 1]<sup>1/n<sub>vG</sub></sup>/α, m = 1 − 1/n<sub>vG</sub>; với S<sub>0</sub> = '+fmtVN(p.S0,2)+' → ψ ≈ '+fmtVN(sw[0],0)+' kPa. Trong đới ngấm ψ = 0.</li>'+
     '<li>Cường độ không bão hòa Vanapalli: τ = c′ + (σ<sub>n</sub> − u<sub>w</sub>)tanφ′ + ψ·S<sub>e</sub>·tanφ′. Mái vô hạn: FS = [c′ + (W<sub>z</sub>cos²β − γ<sub>w</sub>h<sub>w</sub>cos²β)tanφ′ + ψS<sub>e</sub>tanφ′] / (W<sub>z</sub>sinβcosβ), W<sub>z</sub> = γ<sub>sat</sub>·min(h,z) + γ·(z − min(h,z)); lấy FS nhỏ nhất của mặt trượt ở đáy đới ngấm (z = h) và ở đáy tầng phủ (z = D).</li>'+
     '<li>Tầng phủ mỏng dần theo độ dốc (nội suy theo tanβ): '+fmtVN(p.D_max,1)+' m (≤ '+p.beta_min+'°) → '+fmtVN(p.D_min,1)+' m (≥ '+p.beta_max+'°). Độ dốc β: '+(nd?nd+' điểm lấy từ DEM Copernicus 30 m (phân vị 90% trong bán kính 300 m)':'mặc định '+p.beta+'° (chưa có số liệu DEM)')+'.</li>'+
-    '<li>Dự báo xác suất: tính lại FS với 82 kịch bản mưa tổ hợp ECMWF, GFS → tỷ lệ kịch bản FS &lt; 1 và FS &lt; 1,2.</li></ol>'+
+    '<li>Dự báo xác suất: tính lại FS với 82 kịch bản mưa tổ hợp ECMWF, GFS → tỷ lệ kịch bản FS &lt; 1 và FS &lt; 1,2.</li></ol>'+sauMethod(C)+
     '<p>FS &lt; '+fmtVN(ng[0],1)+' → Đạt ngưỡng trượt; &lt; '+fmtVN(ng[1],1)+' → Nguy hiểm (nâng mức cảnh báo); &lt; '+fmtVN(ng[2],1)+' → cần chú ý (chỉ hiển thị). ≥ 30% kịch bản FS &lt; 1 hoặc ≥ 50% kịch bản FS &lt; 1,2 cũng nâng lên Nguy hiểm; ≥ 50% kịch bản FS &lt; 1 lên Đạt ngưỡng trượt.</p>'+
     '<table><tr><td>γ / γ<sub>sat</sub></td><td>'+p.gamma+' / '+p.gamma_sat+' kN/m³</td><td>c′, φ′</td><td>'+p.c+' kPa, '+p.phi+'°</td></tr>'+
     '<tr><td>n = θ<sub>s</sub>, θ<sub>r</sub></td><td>'+fmtVN(p.n,2)+', '+fmtVN(p.theta_r,2)+'</td><td>α, n<sub>vG</sub></td><td>'+fmtVN(p.a_vg,3)+' kPa⁻¹, '+fmtVN(p.n_vg,2)+'</td></tr>'+
