@@ -203,6 +203,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       (Nguyễn Châu Lân, Tuổi Trẻ 03/10/2024) → Đạt ngưỡng trượt; mưa giờ lấy từ dự báo theo giờ của Open-Meteo.<br>
       3) <b>Ngưỡng hiệu chỉnh trên 37 vụ sạt do mưa năm 2026</b> (mưa mô hình ECMWF IFS 0,25°, mô hình bắt nhiều vụ nhất trong 8 mô hình so sánh):
       mưa ngày từ 60 mm hoặc mưa đợt (các ngày liền nhau từ 5 mm) từ 250 mm → Nguy hiểm; mưa ngày từ 40 mm hoặc mưa đợt từ 200 mm → Cần chú ý.
+      Các ngày đã qua và hôm nay dùng mưa lớn hơn giữa ECMWF và mưa vệ tinh IMERG (GSMaP khi IMERG chưa về đủ).
       Mức cuối là mức cao nhất trong ba cách trên và hệ số an toàn FS.</p>
     <p class="note">Hệ số an toàn mái dốc FS tính theo nước mưa ngấm dần vào đất và lực hút dính mất đi khi đất ướt (SWCC):
       FS &lt; 1,2 nâng lên Nguy hiểm, FS &lt; 1 lên Đạt ngưỡng trượt. Cách này bắt được cả đợt mưa kéo dài nhiều ngày mà từng ngày đều dưới ngưỡng.</p>
@@ -226,7 +227,10 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       <li style="border-left-color:#2E9E5B;cursor:default"><b>Sau hiệu chỉnh</b><span>So sánh 8 mô hình mưa, tổ hợp và vệ tinh: ECMWF IFS 0,25° bắt nhiều vụ nhất. Dùng mưa ECMWF và thêm ngưỡng hiệu chỉnh (≥ 60 mm/ngày hoặc ≥ 250 mm/đợt → Nguy hiểm; ≥ 40 mm hoặc ≥ 200 mm → Cần chú ý):
         <b>16/37 vụ</b> đạt từ Nguy hiểm, <b>22/37</b> từ Cần chú ý, 10 vụ được báo trước ít nhất 1 ngày; điểm dự báo quốc lộ gần nhất bắt 5/13 vụ trên quốc lộ.
         Số ngày báo động (từ Nguy hiểm) trong mùa mưa: trung vị 5 ngày mỗi vị trí, cao ở vùng Mù Cang Chải – Chế Tạo (~57 ngày) nơi mưa mô hình rất lớn.</span></li>
-      <li style="border-left-color:#E3B505;cursor:default"><b>Còn bỏ sót</b><span>Các vụ do mưa dông cục bộ mà mô hình gần như không thấy (Minh Lương, Nậm Xé, Mường Khương, Duyên Hải). Ghép mưa vệ tinh IMERG với mô hình bắt được tới 25/37 vụ với ~5 ngày báo động – hướng hoàn thiện tiếp theo, cùng với mưa trạm đo tự động.
+      <li style="border-left-color:#2E9E5B;cursor:default"><b>Ghép mưa vệ tinh (từ 04/10/2026)</b><span>Các ngày đã qua và hôm nay lấy mưa lớn hơn giữa ECMWF và vệ tinh IMERG (GSMaP khi IMERG chưa về đủ):
+        <b>25/37 vụ</b> đạt từ Nguy hiểm, <b>32/37</b> từ Cần chú ý; đổi lại số ngày Nguy hiểm tăng lên khoảng 11 ngày mỗi vị trí trong mùa mưa (Cần chú ý ~21 ngày).
+        Phần tăng này giúp nhận biết lúc mưa đang xảy ra; báo trước vài ngày vẫn dựa vào mưa dự báo ECMWF.</span></li>
+      <li style="border-left-color:#E3B505;cursor:default"><b>Còn bỏ sót</b><span>Một số vụ do mưa dông rất cục bộ mà cả mô hình và vệ tinh đều thấy ít mưa (Minh Lương, Nậm Xé, Mường Khương). Cần thêm mưa trạm đo tự động.
         Ngưỡng hiệu chỉnh trên một mùa mưa nên cần kiểm định lại khi có thêm sự cố.</span></li>
     </ul>
 
