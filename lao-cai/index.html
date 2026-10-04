@@ -300,7 +300,7 @@ let AI_TT=null;                                   // tóm tắt mô hình AI nh�
 function aiCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return g&&g.ai?g.ai:null; }
 function renderAI(){                              // tóm tắt mô hình AI nhạy cảm trượt lở
   const el=document.getElementById('ai-note'); if(!el) return; const a=AI_TT;
-  el.innerHTML=a?'<b>Nhạy cảm trượt lở bằng AI:</b> '+a.mo_hinh+' học từ '+a.so_diem_truot+' điểm trượt đã điều tra và '+a.so_diem_khong+
+  el.innerHTML=a?'<b>Nhạy cảm trượt lở bằng AI:</b> '+a.mo_hinh+' học từ '+a.so_diem_truot+' '+(a.nguon_mau||'điểm trượt đã điều tra')+' và '+a.so_diem_khong+
     ' điểm không trượt với 16 lớp địa hình, thủy văn, thổ nhưỡng, thực phủ, mưa năm; kiểm định '+a.kiem_dinh+': AUC '+fmtVN(a.auc_cv||0,2)+
     ' (cập nhật '+fmtD(a.cap_nhat)+'/'+a.cap_nhat.slice(0,4)+'). '+(QD18?'Xác suất nhạy cảm quanh điểm dự báo quyết định vùng nguy cơ của QĐ 18/2021 (&lt; 0,3 thấp; 0,3–0,5 trung bình; 0,5–0,7 cao; ≥ 0,7 rất cao).':
     'Xác suất nhạy cảm hiển thị trong thông tin từng điểm dự báo.'):''; }
