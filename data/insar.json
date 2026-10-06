@@ -1,6 +1,6 @@
 {
- "cap_nhat": "2026-10-04 15:46",
- "trang_thai": "chua_co_so_lieu",
+ "cap_nhat": "2026-10-06 16:44",
+ "trang_thai": "ok",
  "nguon": "Sentinel-1 (ESA Copernicus), giao thoa ASF HyP3 INSAR_ISCE_MULTI_BURST 80 m, chuỗi thời gian SBAS",
  "quy_uoc": "Tốc độ theo hướng nhìn vệ tinh (LOS, mm/năm): dương = về phía vệ tinh, âm = ra xa",
  "nguong": {
@@ -11,14 +11,397 @@
  "chong": [
   {
    "ma": "T026A-QL6",
-   "trang_thai": "chua_co_so_lieu"
+   "vet": "26A",
+   "so_giao_thoa": 71,
+   "so_ngay_chup": 22,
+   "tu": "2025-10-09",
+   "den": "2026-09-29",
+   "diem_anh_tin_cay": 4581,
+   "diem_anh_hanh_lang": 11467,
+   "trang_thai": "ok"
   },
   {
    "ma": "T128A-KV1",
-   "trang_thai": "chua_co_so_lieu"
+   "vet": "128A",
+   "so_giao_thoa": 90,
+   "so_ngay_chup": 27,
+   "tu": "2025-10-04",
+   "den": "2026-09-24",
+   "diem_anh_tin_cay": 635,
+   "diem_anh_hanh_lang": 10587,
+   "trang_thai": "ok"
   }
  ],
- "tram": {},
- "diem_nong": [],
- "anh": []
+ "tram": {
+  "KV2-Km333": {
+   "n": 43,
+   "v_tv": 0.7,
+   "v_max": -20.9,
+   "p90": 8.4,
+   "ty_le_20": 0.02,
+   "v90_max": 2.2,
+   "v_doc": -1.5,
+   "muc": 0
+  },
+  "KV2-Km336": {
+   "n": 42,
+   "v_tv": 5.2,
+   "v_max": 36.6,
+   "p90": 13.6,
+   "ty_le_20": 0.02,
+   "v90_max": -11.2,
+   "v_doc": -4.2,
+   "muc": 1
+  },
+  "KV2-Km339": {
+   "n": 15,
+   "v_tv": 13.4,
+   "v_max": 27.3,
+   "p90": 23.9,
+   "ty_le_20": 0.2,
+   "v90_max": -56.2,
+   "v_doc": -2.6,
+   "muc": 2
+  },
+  "KV2-Km342": {
+   "n": 47,
+   "v_tv": 10.1,
+   "v_max": 28.1,
+   "p90": 19.0,
+   "ty_le_20": 0.09,
+   "v90_max": -12.4,
+   "v_doc": 0.2,
+   "muc": 1
+  },
+  "KV2-Km345": {
+   "n": 44,
+   "v_tv": 1.3,
+   "v_max": -23.6,
+   "p90": 16.0,
+   "ty_le_20": 0.05,
+   "v90_max": 5.9,
+   "v_doc": 5.5,
+   "muc": 1
+  },
+  "KV1-Km116": {
+   "n": 35,
+   "v_tv": 3.7,
+   "v_max": 12.0,
+   "p90": 9.2,
+   "ty_le_20": 0.0,
+   "v90_max": -22.5,
+   "v_doc": -6.2,
+   "muc": 0
+  }
+ },
+ "diem_nong": [
+  {
+   "xy": [
+    103.6458,
+    21.50122
+   ],
+   "so_px": 28,
+   "dien_tich_ha": 17.9,
+   "v_tb": -29.6,
+   "v_max": -43.4,
+   "cach_tuyen_m": 850,
+   "diem_gan": "KV2-Km330",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.34877,
+    21.74029
+   ],
+   "so_px": 32,
+   "dien_tich_ha": 20.5,
+   "v_tb": -25.5,
+   "v_max": -39.2,
+   "cach_tuyen_m": 905,
+   "diem_gan": "KV3-Km405",
+   "zone": "KV3",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.61243,
+    21.54668
+   ],
+   "so_px": 17,
+   "dien_tich_ha": 10.9,
+   "v_tb": -32.9,
+   "v_max": -53.4,
+   "cach_tuyen_m": 936,
+   "diem_gan": "KV2-Km336",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.61211,
+    21.54116
+   ],
+   "so_px": 13,
+   "dien_tich_ha": 8.3,
+   "v_tb": -26.9,
+   "v_max": -51.8,
+   "cach_tuyen_m": 329,
+   "diem_gan": "KV2-Km336",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.5958,
+    21.53213
+   ],
+   "so_px": 10,
+   "dien_tich_ha": 6.4,
+   "v_tb": -31.0,
+   "v_max": -38.3,
+   "cach_tuyen_m": 80,
+   "diem_gan": "KV2-Km339",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.58945,
+    21.53748
+   ],
+   "so_px": 11,
+   "dien_tich_ha": 7.0,
+   "v_tb": 26.9,
+   "v_max": 36.4,
+   "cach_tuyen_m": 0,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.63144,
+    21.51755
+   ],
+   "so_px": 9,
+   "dien_tich_ha": 5.8,
+   "v_tb": -29.4,
+   "v_max": -39.2,
+   "cach_tuyen_m": 905,
+   "diem_gan": "KV2-Km333",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.57719,
+    21.54584
+   ],
+   "so_px": 9,
+   "dien_tich_ha": 5.8,
+   "v_tb": 25.2,
+   "v_max": 37.1,
+   "cach_tuyen_m": 0,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.6012,
+    21.53435
+   ],
+   "so_px": 7,
+   "dien_tich_ha": 4.5,
+   "v_tb": 27.5,
+   "v_max": 36.9,
+   "cach_tuyen_m": 113,
+   "diem_gan": "KV2-Km339",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.58029,
+    21.5509
+   ],
+   "so_px": 7,
+   "dien_tich_ha": 4.5,
+   "v_tb": 25.4,
+   "v_max": 30.5,
+   "cach_tuyen_m": 400,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.59819,
+    21.5349
+   ],
+   "so_px": 6,
+   "dien_tich_ha": 3.8,
+   "v_tb": 27.3,
+   "v_max": 39.4,
+   "cach_tuyen_m": 0,
+   "diem_gan": "KV2-Km339",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.57244,
+    21.54841
+   ],
+   "so_px": 6,
+   "dien_tich_ha": 3.8,
+   "v_tb": 25.5,
+   "v_max": 30.4,
+   "cach_tuyen_m": 0,
+   "diem_gan": "KV2-Km345",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.58537,
+    21.54322
+   ],
+   "so_px": 6,
+   "dien_tich_ha": 3.8,
+   "v_tb": 24.9,
+   "v_max": 31.2,
+   "cach_tuyen_m": 178,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.61884,
+    21.53731
+   ],
+   "so_px": 5,
+   "dien_tich_ha": 3.2,
+   "v_tb": 28.9,
+   "v_max": 36.6,
+   "cach_tuyen_m": 0,
+   "diem_gan": "KV2-Km336",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.59347,
+    21.54158
+   ],
+   "so_px": 5,
+   "dien_tich_ha": 3.2,
+   "v_tb": 26.7,
+   "v_max": 33.9,
+   "cach_tuyen_m": 466,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.59417,
+    21.54516
+   ],
+   "so_px": 4,
+   "dien_tich_ha": 2.6,
+   "v_tb": 28.7,
+   "v_max": 40.0,
+   "cach_tuyen_m": 861,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.59423,
+    21.53884
+   ],
+   "so_px": 4,
+   "dien_tich_ha": 2.6,
+   "v_tb": 28.2,
+   "v_max": 33.4,
+   "cach_tuyen_m": 240,
+   "diem_gan": "KV2-Km339",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.58985,
+    21.53248
+   ],
+   "so_px": 4,
+   "dien_tich_ha": 2.6,
+   "v_tb": 25.8,
+   "v_max": 32.0,
+   "cach_tuyen_m": 400,
+   "diem_gan": "KV2-Km339",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.63673,
+    21.5157
+   ],
+   "so_px": 4,
+   "dien_tich_ha": 2.6,
+   "v_tb": -21.5,
+   "v_max": -23.0,
+   "cach_tuyen_m": 624,
+   "diem_gan": "KV2-Km333",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  },
+  {
+   "xy": [
+    103.58936,
+    21.54277
+   ],
+   "so_px": 4,
+   "dien_tich_ha": 2.6,
+   "v_tb": 20.7,
+   "v_max": 21.9,
+   "cach_tuyen_m": 430,
+   "diem_gan": "KV2-Km342",
+   "zone": "KV2",
+   "chong": "T026A-QL6"
+  }
+ ],
+ "anh": [
+  {
+   "tep": "insar_T026A-QL6.png",
+   "bien": [
+    [
+     21.49055,
+     103.28563
+    ],
+    [
+     21.82379,
+     103.6684
+    ]
+   ]
+  },
+  {
+   "tep": "insar_T128A-KV1.png",
+   "bien": [
+    [
+     20.63406,
+     104.9831
+    ],
+    [
+     20.73482,
+     105.17477
+    ]
+   ]
+  }
+ ]
 }
