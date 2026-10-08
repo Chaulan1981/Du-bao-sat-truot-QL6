@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-08 00:51",
+ "updated": "2026-10-08 09:44",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -665,9 +665,9 @@
     "tu_ngay": "2026-09-18",
     "anh_moi_nhat": "2026-10-07",
     "so_anh": 5,
-    "quang_may_%": 95,
+    "quang_may_%": 100,
     "tong_ha": 0.0,
-    "lech_chung_NDVI": 0.08,
+    "lech_chung_NDVI": 0.099,
     "vung": []
    }
   },
