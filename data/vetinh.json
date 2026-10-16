@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-16 08:28",
+ "updated": "2026-10-16 22:24",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -511,7 +511,7 @@
     "Km124+300": 62
    },
    "S1": {
-    "ngay": "2026-10-06 18:05",
+    "ngay": "2026-10-16 05:50",
     "chieu": "đi lên + đi xuống",
     "ve_tinh": "Sentinel-1D",
     "cac_luot": [
@@ -531,29 +531,29 @@
       "chieu": "đi xuống",
       "quy_dao": 91,
       "ve_tinh": "Sentinel-1D",
-      "ngay": "2026-10-04 05:50",
+      "ngay": "2026-10-16 05:50",
       "so_anh_nen": 4,
-      "tong_ha": 0.56,
+      "tong_ha": 0.63,
       "lech_chung_dB": {
-       "VH": -0.31,
-       "VV": -0.28
+       "VH": -0.41,
+       "VV": -0.19
       }
      }
     ],
     "so_anh_nen": 4,
     "hanh_lang_ha": 1411.0,
-    "tong_ha": 0.56,
+    "tong_ha": 0.63,
     "vung": [
      {
       "xy": [
-       105.07466,
-       20.69412
+       105.15351,
+       20.64906
       ],
-      "ha": 0.56,
-      "cach_duong_m": 166,
-      "dVH_dB": 4.1,
+      "ha": 0.63,
+      "cach_duong_m": 230,
+      "dVH_dB": -3.8,
       "chieu": "đi xuống",
-      "km": 128.03
+      "km": 116.46
      }
     ],
     "dien_rong": false
