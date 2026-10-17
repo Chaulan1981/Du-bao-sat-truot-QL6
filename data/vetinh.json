@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-17 08:21",
+ "updated": "2026-10-17 21:16",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -677,10 +677,10 @@
    "S2": {
     "tu_ngay": "2026-09-27",
     "anh_moi_nhat": "2026-10-12",
-    "so_anh": 5,
+    "so_anh": 4,
     "quang_may_%": 100,
     "tong_ha": 0.83,
-    "lech_chung_NDVI": 0.002,
+    "lech_chung_NDVI": 0.006,
     "vung": [
      {
       "xy": [
@@ -727,7 +727,7 @@
    },
    "S2": {
     "tu_ngay": "2026-09-27",
-    "anh_moi_nhat": "2026-10-12",
+    "anh_moi_nhat": "2026-10-17",
     "so_anh": 5,
     "quang_may_%": 100,
     "tong_ha": 1.56,
