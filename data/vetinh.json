@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-21 08:41",
+ "updated": "2026-10-21 22:59",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -627,7 +627,7 @@
    "duong": "GRIP4 (1 đoạn)",
    "kiem_tra_gps_m": {},
    "S1": {
-    "ngay": "2026-10-11 18:13",
+    "ngay": "2026-10-21 05:58",
     "chieu": "đi lên + đi xuống",
     "ve_tinh": "Sentinel-1D",
     "cac_luot": [
@@ -647,40 +647,62 @@
       "chieu": "đi xuống",
       "quy_dao": 164,
       "ve_tinh": "Sentinel-1D",
-      "ngay": "2026-10-09 05:58",
+      "ngay": "2026-10-21 05:58",
       "so_anh_nen": 7,
-      "tong_ha": 1.63,
+      "tong_ha": 3.02,
       "lech_chung_dB": {
-       "VH": -1.06,
-       "VV": -0.81
+       "VH": -0.81,
+       "VV": -0.69
       }
      }
     ],
     "so_anh_nen": 7,
     "hanh_lang_ha": 1169.0,
-    "tong_ha": 1.97,
+    "tong_ha": 3.36,
     "vung": [
      {
       "xy": [
-       103.58421,
-       21.54597
+       103.55997,
+       21.5522
       ],
-      "ha": 0.78,
-      "cach_duong_m": 256,
-      "dVH_dB": -3.9,
+      "ha": 0.91,
+      "cach_duong_m": 274,
+      "dVH_dB": -3.6,
       "chieu": "đi xuống",
-      "km": 342.24
+      "km": 345.0
      },
      {
       "xy": [
-       103.58338,
-       21.54484
+       103.62068,
+       21.53843
       ],
-      "ha": 0.55,
-      "cach_duong_m": 121,
-      "dVH_dB": -4.1,
+      "ha": 0.64,
+      "cach_duong_m": 106,
+      "dVH_dB": -4.5,
       "chieu": "đi xuống",
-      "km": 342.17
+      "km": 336.2
+     },
+     {
+      "xy": [
+       103.58394,
+       21.54619
+      ],
+      "ha": 0.56,
+      "cach_duong_m": 255,
+      "dVH_dB": -4.3,
+      "chieu": "đi xuống",
+      "km": 342.28
+     },
+     {
+      "xy": [
+       103.58611,
+       21.53678
+      ],
+      "ha": 0.52,
+      "cach_duong_m": 181,
+      "dVH_dB": -3.8,
+      "chieu": "đi xuống",
+      "km": 341.14
      }
     ],
     "dien_rong": false
