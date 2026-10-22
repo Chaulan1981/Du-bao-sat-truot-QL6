@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22 08:36",
+ "updated": "2026-10-22 22:55",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -17,8 +17,8 @@
    "IMERG",
    "IMERG",
    "IMERG",
+   "IMERG",
    "GSMaP",
-   "GSMaP (thiếu giờ)",
    "GSMaP (thiếu giờ)",
    null
   ],
@@ -36,9 +36,9 @@
    24,
    24,
    24,
-   22,
-   4,
-   2,
+   24,
+   24,
+   20,
    0
   ],
   "nua_gio_IMERG": [
@@ -55,9 +55,9 @@
    48,
    48,
    48,
-   27,
-   5,
-   0,
+   46,
+   35,
+   17,
    0
   ],
   "tram": {
@@ -709,21 +709,21 @@
    },
    "S2": {
     "tu_ngay": "2026-10-02",
-    "anh_moi_nhat": "2026-10-19",
+    "anh_moi_nhat": "2026-10-22",
     "so_anh": 5,
     "quang_may_%": 100,
-    "tong_ha": 0.87,
-    "lech_chung_NDVI": -0.006,
+    "tong_ha": 0.69,
+    "lech_chung_NDVI": -0.002,
     "vung": [
      {
       "xy": [
-       103.58398,
-       21.53742
+       103.58392,
+       21.53758
       ],
-      "ha": 0.87,
+      "ha": 0.69,
       "cach_duong_m": 195,
-      "dNDVI": -0.35,
-      "km": 341.42
+      "dNDVI": -0.29,
+      "km": 341.44
      }
     ]
    }
@@ -761,17 +761,17 @@
    "S2": {
     "tu_ngay": "2026-10-02",
     "anh_moi_nhat": "2026-10-19",
-    "so_anh": 5,
+    "so_anh": 4,
     "quang_may_%": 100,
-    "tong_ha": 0.7,
-    "lech_chung_NDVI": 0.02,
+    "tong_ha": 0.67,
+    "lech_chung_NDVI": 0.019,
     "vung": [
      {
       "xy": [
-       103.33761,
+       103.33762,
        21.74608
       ],
-      "ha": 0.64,
+      "ha": 0.6,
       "cach_duong_m": 299,
       "dNDVI": -0.42,
       "km": 405.0
