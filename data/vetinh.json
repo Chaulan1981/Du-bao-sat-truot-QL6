@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-23 08:36",
+ "updated": "2026-10-23 22:46",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -636,8 +636,8 @@
       "quy_dao": 26,
       "ve_tinh": "Sentinel-1D",
       "ngay": "2026-10-11 18:13",
-      "so_anh_nen": 7,
-      "tong_ha": 0.34,
+      "so_anh_nen": 6,
+      "tong_ha": 0.88,
       "lech_chung_dB": {
        "VH": -0.44,
        "VV": -0.56
@@ -656,21 +656,10 @@
       }
      }
     ],
-    "so_anh_nen": 7,
+    "so_anh_nen": 6,
     "hanh_lang_ha": 1169.0,
-    "tong_ha": 3.36,
+    "tong_ha": 3.9,
     "vung": [
-     {
-      "xy": [
-       103.55997,
-       21.5522
-      ],
-      "ha": 0.91,
-      "cach_duong_m": 274,
-      "dVH_dB": -3.6,
-      "chieu": "đi xuống",
-      "km": 345.0
-     },
      {
       "xy": [
        103.62068,
@@ -692,6 +681,17 @@
       "dVH_dB": -4.3,
       "chieu": "đi xuống",
       "km": 342.28
+     },
+     {
+      "xy": [
+       103.56026,
+       21.55226
+      ],
+      "ha": 0.52,
+      "cach_duong_m": 276,
+      "dVH_dB": -3.3,
+      "chieu": "đi lên",
+      "km": 345.0
      },
      {
       "xy": [
@@ -824,15 +824,15 @@
       "quy_dao": 26,
       "ve_tinh": "Sentinel-1D",
       "ngay": "2026-10-11 18:13",
-      "so_anh_nen": 7,
+      "so_anh_nen": 6,
       "tong_ha": 0.0,
       "lech_chung_dB": {
-       "VH": -0.44,
+       "VH": -0.56,
        "VV": -0.56
       }
      }
     ],
-    "so_anh_nen": 7,
+    "so_anh_nen": 6,
     "hanh_lang_ha": 762.0,
     "tong_ha": 0.0,
     "vung": [],
@@ -843,8 +843,8 @@
     "anh_moi_nhat": "2026-10-22",
     "so_anh": 5,
     "quang_may_%": 100,
-    "tong_ha": 0.67,
-    "lech_chung_NDVI": 0.019,
+    "tong_ha": 1.57,
+    "lech_chung_NDVI": 0.012,
     "vung": [
      {
       "xy": [
@@ -855,6 +855,16 @@
       "cach_duong_m": 299,
       "dNDVI": -0.42,
       "km": 405.0
+     },
+     {
+      "xy": [
+       103.30341,
+       21.8009
+      ],
+      "ha": 0.55,
+      "cach_duong_m": 209,
+      "dNDVI": -0.4,
+      "km": 415.4
      }
     ]
    }
