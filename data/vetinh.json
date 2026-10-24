@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-24 08:40",
+ "updated": "2026-10-24 21:38",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -571,53 +571,12 @@
    },
    "S2": {
     "tu_ngay": "2026-10-04",
-    "anh_moi_nhat": "2026-10-19",
-    "so_anh": 20,
-    "quang_may_%": 98,
-    "tong_ha": 4.78,
+    "anh_moi_nhat": "2026-10-24",
+    "so_anh": 24,
+    "quang_may_%": 96,
+    "tong_ha": 0.0,
     "lech_chung_NDVI": -0.061,
-    "vung": [
-     {
-      "xy": [
-       105.08039,
-       20.69933
-      ],
-      "ha": 1.99,
-      "cach_duong_m": 0,
-      "dNDVI": -0.34,
-      "km": 128.56
-     },
-     {
-      "xy": [
-       105.08866,
-       20.6752
-      ],
-      "ha": 1.13,
-      "cach_duong_m": 222,
-      "dNDVI": -0.36,
-      "km": 125.46
-     },
-     {
-      "xy": [
-       105.08228,
-       20.70116
-      ],
-      "ha": 1.02,
-      "cach_duong_m": 149,
-      "dNDVI": -0.35,
-      "km": 128.56
-     },
-     {
-      "xy": [
-       105.0781,
-       20.70157
-      ],
-      "ha": 0.52,
-      "cach_duong_m": 67,
-      "dNDVI": -0.34,
-      "km": 128.87
-     }
-    ]
+    "vung": []
    }
   },
   "KV2": {
@@ -627,7 +586,7 @@
    "duong": "GRIP4 (1 đoạn)",
    "kiem_tra_gps_m": {},
    "S1": {
-    "ngay": "2026-10-21 05:58",
+    "ngay": "2026-10-23 18:13",
     "chieu": "đi lên + đi xuống",
     "ve_tinh": "Sentinel-1D",
     "cac_luot": [
@@ -635,11 +594,11 @@
       "chieu": "đi lên",
       "quy_dao": 26,
       "ve_tinh": "Sentinel-1D",
-      "ngay": "2026-10-11 18:13",
-      "so_anh_nen": 6,
-      "tong_ha": 0.88,
+      "ngay": "2026-10-23 18:13",
+      "so_anh_nen": 7,
+      "tong_ha": 2.76,
       "lech_chung_dB": {
-       "VH": -0.44,
+       "VH": -0.31,
        "VV": -0.56
       }
      },
@@ -656,10 +615,43 @@
       }
      }
     ],
-    "so_anh_nen": 6,
+    "so_anh_nen": 7,
     "hanh_lang_ha": 1169.0,
-    "tong_ha": 3.9,
+    "tong_ha": 5.78,
     "vung": [
+     {
+      "xy": [
+       103.55997,
+       21.5522
+      ],
+      "ha": 0.91,
+      "cach_duong_m": 274,
+      "dVH_dB": -3.6,
+      "chieu": "đi xuống",
+      "km": 345.0
+     },
+     {
+      "xy": [
+       103.58418,
+       21.53687
+      ],
+      "ha": 0.82,
+      "cach_duong_m": 247,
+      "dVH_dB": -3.8,
+      "chieu": "đi lên",
+      "km": 341.36
+     },
+     {
+      "xy": [
+       103.58899,
+       21.53599
+      ],
+      "ha": 0.81,
+      "cach_duong_m": 123,
+      "dVH_dB": -4.0,
+      "chieu": "đi lên",
+      "km": 340.78
+     },
      {
       "xy": [
        103.62068,
@@ -670,6 +662,17 @@
       "dVH_dB": -4.5,
       "chieu": "đi xuống",
       "km": 336.2
+     },
+     {
+      "xy": [
+       103.55746,
+       21.54759
+      ],
+      "ha": 0.62,
+      "cach_duong_m": 268,
+      "dVH_dB": -4.0,
+      "chieu": "đi lên",
+      "km": 345.0
      },
      {
       "xy": [
@@ -684,17 +687,6 @@
      },
      {
       "xy": [
-       103.56026,
-       21.55226
-      ],
-      "ha": 0.52,
-      "cach_duong_m": 276,
-      "dVH_dB": -3.3,
-      "chieu": "đi lên",
-      "km": 345.0
-     },
-     {
-      "xy": [
        103.58611,
        21.53678
       ],
@@ -703,6 +695,17 @@
       "dVH_dB": -3.8,
       "chieu": "đi xuống",
       "km": 341.14
+     },
+     {
+      "xy": [
+       103.56731,
+       21.55199
+      ],
+      "ha": 0.5,
+      "cach_duong_m": 141,
+      "dVH_dB": -4.2,
+      "chieu": "đi lên",
+      "km": 344.2
      }
     ],
     "dien_rong": false
@@ -815,7 +818,7 @@
    "duong": "GRIP4 (1 đoạn)",
    "kiem_tra_gps_m": {},
    "S1": {
-    "ngay": "2026-10-11 18:13",
+    "ngay": "2026-10-23 18:13",
     "chieu": "đi lên",
     "ve_tinh": "Sentinel-1D",
     "cac_luot": [
@@ -823,16 +826,16 @@
       "chieu": "đi lên",
       "quy_dao": 26,
       "ve_tinh": "Sentinel-1D",
-      "ngay": "2026-10-11 18:13",
-      "so_anh_nen": 6,
+      "ngay": "2026-10-23 18:13",
+      "so_anh_nen": 7,
       "tong_ha": 0.0,
       "lech_chung_dB": {
        "VH": -0.56,
-       "VV": -0.56
+       "VV": -0.69
       }
      }
     ],
-    "so_anh_nen": 6,
+    "so_anh_nen": 7,
     "hanh_lang_ha": 762.0,
     "tong_ha": 0.0,
     "vung": [],
