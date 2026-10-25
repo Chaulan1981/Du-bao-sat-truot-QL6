@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-25 08:16",
+ "updated": "2026-10-25 21:58",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -16,9 +16,9 @@
    "IMERG",
    "IMERG",
    "GSMaP",
-   "GSMaP (thiếu giờ)",
-   "GSMaP (thiếu giờ)",
-   "GSMaP (thiếu giờ)",
+   "IMERG",
+   "IMERG",
+   "GSMaP",
    "GSMaP (thiếu giờ)",
    null
   ],
@@ -35,10 +35,10 @@
    24,
    24,
    24,
-   21,
-   12,
-   7,
-   3,
+   24,
+   24,
+   24,
+   5,
    0
   ],
   "nua_gio_IMERG": [
@@ -53,10 +53,10 @@
    48,
    48,
    46,
-   35,
-   33,
-   17,
-   10,
+   38,
+   48,
+   46,
+   27,
    0,
    0
   ],
