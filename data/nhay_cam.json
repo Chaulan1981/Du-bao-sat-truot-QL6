@@ -1,5 +1,5 @@
 {
- "cap_nhat": "2026-10-04",
+ "cap_nhat": "2026-11-09",
  "mo_hinh": "Random Forest 200 cây (Earth Engine)",
  "phuong_an": "vết sạt bão Yagi (Sentinel-2) – bỏ mưa năm",
  "nguon_mau": "điểm lấy trên vết sạt sau bão Yagi 9/2024 (Sentinel-2)",
@@ -20,9 +20,9 @@
   "rất cao"
  ],
  "ty_le": {
-  "thấp": 92.4,
-  "trung bình": 6.3,
-  "cao": 1.2,
+  "thấp": 93.1,
+  "trung bình": 6.0,
+  "cao": 0.8,
   "rất cao": 0.1
  },
  "anh": [
@@ -53,19 +53,6 @@
    ]
   },
   {
-   "tep": "nhay_cam_10350_2125.png",
-   "bien": [
-    [
-     21.25,
-     103.5
-    ],
-    [
-     21.5,
-     103.75
-    ]
-   ]
-  },
-  {
    "tep": "nhay_cam_10350_2150.png",
    "bien": [
     [
@@ -88,19 +75,6 @@
     [
      20.75,
      105.0
-    ]
-   ]
-  },
-  {
-   "tep": "nhay_cam_10500_2050.png",
-   "bien": [
-    [
-     20.5,
-     105.0
-    ],
-    [
-     20.75,
-     105.25
     ]
    ]
   }
