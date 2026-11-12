@@ -5,6 +5,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Chính sách bảo mật nội dung: chỉ nạp mã từ chính trang này; chỉ gọi Open-Meteo; ảnh nền chỉ từ 3 máy chủ bản đồ. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.opentopomap.org https://server.arcgisonline.com; connect-src 'self' https://api.open-meteo.com https://ensemble-api.open-meteo.com https://historical-forecast-api.open-meteo.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Dự báo sạt lở Lào Cai – cảnh báo tự động</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1D2A30">
@@ -293,6 +295,19 @@ let DAY_TXT = ['Hôm nay','Ngày mai','+2 ngày','+3 ngày'];
 let REPLAY = null;                       // 'YYYY-MM-DD' khi đang xem lại
 const EVENTS = [["2024-09-09", "Bão Yagi (số 3): sạt taluy, đất đá tràn mặt đường tại 20 điểm QL70 (Yên Bái)"], ["2024-09-10", "Làng Nủ (Phúc Khánh, Bảo Yên): lũ quét, sạt lở vùi lấp thôn"], ["2025-09-29", "Đèo Khau Phạ QL32: 30–40 điểm sạt từ 29/9, Km269 sụt khoảng 30 m đường"], ["2026-05-04", "QL4D Km120+900 (Tả Phìn): đá đổ taluy, tắc đường lên Sa Pa"], ["2026-07-16", "Mưa lớn Mù Cang Chải, Văn Bàn: sạt QL32, QL279 (Minh Lương, Nậm Xé), hàng trăm điểm ở Chế Tạo"], ["2026-07-27", "QL32 Km328+550 (Khao Mang): sạt khoảng 800 m³, tắc đường"], ["2026-07-28", "San Lùng, Bản Xèo (Bát Xát): sạt khoảng 36.000 m³"], ["2026-08-05", "Thủy điện Mý Háng Tầu (Chế Tạo): sạt lớn, 1 người chết"], ["2026-09-14", "Mưa lớn Văn Chấn, Trạm Tấu: sạt QL32 Km265+900 (Tú Lệ), Phình Hồ, Mỏ Vàng"], ["2026-09-19", "Tân Hợp (Văn Yên): sạt 5.000–10.000 m³, cô lập 37 hộ"], ["2026-09-30", "QL279 Km79+200 (Bảo Hà): sạt taluy khoảng 10.000–25.000 m³, tắc đường"]];   // sự cố đã xác minh (báo chí)
 function addDays(iso,n){const d=new Date(iso+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10);}
+/* ---------- An toàn dữ liệu: mọi chuỗi không do trang này viết ra (tệp JSON, Open-Meteo, bộ nhớ đệm, tên tệp, EXIF)
+   đều phải qua esc()/deepEsc() trước khi ghép vào HTML; số liệu mưa phải qua kiemTraMua(). ---------- */
+function esc(t){ return String(t==null?'':t).replace(/[&<>"'`]/g,c=>'&#'+c.charCodeAt(0)+';'); }
+function deepEsc(x,sau){ sau=sau||0; if(typeof x==='string') return esc(x); if(x===null||typeof x!=='object'||sau>12) return (typeof x==='number'||typeof x==='boolean'||x===null)?x:null;
+  if(Array.isArray(x)) return x.map(v=>deepEsc(v,sau+1)); const o={}; Object.keys(x).forEach(k=>{ if(k!=='__proto__') o[k]=deepEsc(x[k],sau+1); }); return o; }
+const RE_NGAY=/^\d{4}-\d{2}-\d{2}$/;
+function ngayHopLe(iso){ if(typeof iso!=='string'||!RE_NGAY.test(iso)) return false; const d=new Date(iso+'T00:00:00Z'); return !isNaN(d)&&d.toISOString().slice(0,10)===iso; }
+function homNayVN(){ return new Date(Date.now()+7*3600e3).toISOString().slice(0,10); }
+function kiemTraMua(l){    // chỉ nhận ngày YYYY-MM-DD và lượng mưa là số hữu hạn 0–3000 mm (null = thiếu số liệu)
+  const d=l&&l.daily; if(!d||!Array.isArray(d.time)||!Array.isArray(d.precipitation_sum)||d.time.length!==d.precipitation_sum.length) throw new Error('Số liệu mưa sai định dạng');
+  if(!d.time.every(ngayHopLe)) throw new Error('Số liệu mưa có ngày sai định dạng');
+  if(!d.precipitation_sum.every(v=>v==null||(typeof v==='number'&&isFinite(v)&&v>=0&&v<3000))) throw new Error('Số liệu mưa có giá trị bất thường');
+  return l; }
 const REFRESH_MIN = 30;
 const PERSIST_DAYS = 7;   // duy trì cảnh báo sau ngày mưa vượt ngưỡng (kiểm định 2023–2026)
 const PAST_DAYS = 17;     // 10 ngày tính P10 + 7 ngày duy trì
@@ -311,17 +326,24 @@ function aiRows(s){ const a=aiCua(s); if(!a) return '';
 async function loadServer(){
   if(DH) return;
   try{ const r=await fetch('data/alerts.json',{cache:'no-store'}); const sv=r.ok?await r.json():null; const diem={};
-    (sv&&sv.stations||[]).forEach(x=>{ if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định') diem[x.id]={doc:x.on_dinh.beta};
+    (sv&&Array.isArray(sv.stations)?sv.stations:[]).forEach(x=>{ if(!x||typeof x.id!=='string') return;
+      if(x.on_dinh&&x.on_dinh.nguon_doc!=='mặc định'&&isFinite(+x.on_dinh.beta)) diem[x.id]={doc:+x.on_dinh.beta};
       if(x.lop_nang) (diem[x.id]=diem[x.id]||{}).nang=1;
-      if(x.truot_sau) (diem[x.id]=diem[x.id]||{}).sau=x.truot_sau;    // hình học trượt sâu (β P75, chiều cao sườn)
-      if(x.nhay_cam) (diem[x.id]=diem[x.id]||{}).ai=x.nhay_cam; });  // AI nhạy cảm (Random Forest)
-    if(sv&&sv.nhay_cam) AI_TT=sv.nhay_cam;   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
+      if(x.truot_sau) (diem[x.id]=diem[x.id]||{}).sau=deepEsc(x.truot_sau);    // hình học trượt sâu (β P75, chiều cao sườn)
+      if(x.nhay_cam) (diem[x.id]=diem[x.id]||{}).ai=deepEsc(x.nhay_cam); });  // AI nhạy cảm (Random Forest)
+    if(sv&&sv.nhay_cam) AI_TT=deepEsc(sv.nhay_cam);   // gần điểm sạt đã điều tra -> vùng nguy cơ +1 bậc
     if(Object.keys(diem).length) DH={nguon:'DEM Copernicus 30 m',diem};
   }catch(_){}
 }
 const FS_NG = [1.0, 1.2, 1.3];
 function fsMuc(f,ng){ ng=ng||FS_NG; return f<ng[0]?3:f<ng[1]?2:f<ng[2]?1:0; }
 let RESULT = null, DAY = 0, lastNotified = '';
+const DAY_TXT_GOC = DAY_TXT.slice();
+const KHOA_LUU = 'du_bao_'+(DATA.ten_tuyen||'QL6');     // mỗi vùng một khóa: trang QL6 và trang vùng khác cùng tên miền, không được đọc nhầm của nhau
+try{ localStorage.removeItem('ql6_du_bao'); }catch(_){}   // khóa cũ dùng chung giữa các vùng
+function luuHopLe(sv){ const r=sv&&sv.r;                 // dự báo lưu phải đúng danh sách điểm của trang này và đủ 4 ngày hợp lệ
+  return Array.isArray(r)&&r.length===DATA.stations.length&&isFinite(+sv.t)&&r.every((s,i)=>s&&s.id===DATA.stations[i].id&&Array.isArray(s.days)&&s.days.length===4&&
+    s.days.every(d=>d&&ngayHopLe(d.date)&&[0,1,2,3].includes(d.lv)&&typeof d.P==='number'&&typeof d.ratio==='number')); }
 
 /* ---------- Bản đồ ---------- */
 const map = L.map('map',{zoomControl:true}).setView([20.95,104.4],8);
@@ -436,7 +458,7 @@ function evalStation(pr, times, isRock, lop, gio){
 /* ---------- Vệ tinh (job GitHub Actions + Google Earth Engine) ---------- */
 let VT = null;
 async function loadSat(){
-  try{ const r=await fetch('data/vetinh.json',{cache:'no-store'}); if(r.ok) VT=await r.json(); }catch(_){}
+  try{ const r=await fetch('data/vetinh.json',{cache:'no-store'}); if(r.ok) VT=deepEsc(await r.json()); }catch(_){}
   renderSat();
 }
 function satAgeDays(){ if(!VT||!VT.updated) return 99; return (Date.now()-new Date(VT.updated.replace(' ','T')+':00+07:00'))/864e5; }
@@ -489,7 +511,7 @@ function renderSat(){
 /* ---------- Bản đồ vùng nguy cơ trượt lở (job AI hằng tuần trên Earth Engine) ---------- */
 let NCBD = null;
 async function loadNhayCam(){
-  try{ const r=await fetch('data/nhay_cam.json',{cache:'no-store'}); if(r.ok) NCBD=await r.json(); }catch(_){}
+  try{ const r=await fetch('data/nhay_cam.json',{cache:'no-store'}); if(r.ok) NCBD=deepEsc(await r.json()); }catch(_){}
   renderNhayCam();
 }
 function renderNhayCam(){
@@ -512,7 +534,7 @@ function renderNhayCam(){
 /* ---------- InSAR Sentinel-1 (job GitHub Actions + ASF HyP3, chuỗi SBAS) ---------- */
 let INSAR = null;
 async function loadInsar(){
-  try{ const r=await fetch('data/insar.json',{cache:'no-store'}); if(r.ok) INSAR=await r.json(); }catch(_){}
+  try{ const r=await fetch('data/insar.json',{cache:'no-store'}); if(r.ok) INSAR=deepEsc(await r.json()); }catch(_){}
   renderInsar(); if(RESULT) renderMap();           // thêm dòng InSAR vào popup điểm dự báo
 }
 function insarTxt(v){ return (v>0?'+':'')+fmtVN(v,0)+' mm/năm'; }
@@ -556,6 +578,7 @@ function insarRows(s){
 const ENS_MODELS = 'ecmwf_ifs025,gfs025';
 const P_HI = 0.5, P_MID = 0.3;    // >=50% đạt ngưỡng -> mức 3; >=30% đạt ngưỡng hoặc >=50% Nguy hiểm -> mức 2; >=30% Nguy hiểm -> mức 1
 let ENS_N = 0;
+let LECH_NGAY = null;            // ngày đầu của số liệu mưa nếu KHÁC ngày hôm nay (giờ VN): số liệu cũ hoặc đồng hồ máy sai
 async function fetchEnsemble(st){
   const lat = st.map(s=>s.xy[1].toFixed(4)).join(','), lon = st.map(s=>s.xy[0].toFixed(4)).join(',');
   for(const m of [ENS_MODELS,'ecmwf_ifs025']){
@@ -569,8 +592,8 @@ async function fetchEnsemble(st){
 }
 function ensMembers(loc){
   const d=(loc&&loc.daily)||{}; const cols=Object.keys(d).filter(k=>k.startsWith('precipitation_sum')&&Array.isArray(d[k]))
-    .map(k=>d[k]).filter(c=>c.every(x=>x!=null));
-  return {times:d.time||[], cols};
+    .map(k=>d[k]).filter(c=>c.every(x=>typeof x==='number'&&isFinite(x)&&x>=0&&x<3000));
+  return {times:(Array.isArray(d.time)?d.time:[]).filter(ngayHopLe), cols};
 }
 function ensProb(pr, tm, et, cols, isRock, lop){
   if(!cols.length) return null; const idx={}; et.forEach((t,i)=>idx[t]=i); const out=[];
@@ -604,17 +627,20 @@ async function fetchForecast(){
     : Promise.resolve(null);
   const r = await fetch(url);
   if(!r.ok) throw new Error('Máy chủ Open-Meteo trả lỗi '+r.status);
-  let j = await r.json(); if(!Array.isArray(j)) j=[j]; j=j.map(chuanMua);
+  let j = await r.json(); if(!Array.isArray(j)) j=[j]; j=j.map(chuanMua).map(kiemTraMua);
+  if(j.length!==st.length) throw new Error('Open-Meteo trả về '+j.length+' điểm, cần '+st.length);
   const GIO = await gioP;
   const res = st.map((s,i)=>{
     const d = j[i].daily, prF = d.precipitation_sum.map(v=>v||0), tmF = d.time;
     const off = prF.length-(PAST_DAYS+4);
     if(off<0) throw new Error('Thiếu số liệu mưa cho ngày đã chọn');
+    // ngày không có số liệu mưa đang được tính là 0 mm -> phải báo cho người xem, không lặng lẽ coi là an toàn
+    const thieuDB = d.precipitation_sum.slice(-4).filter(v=>v==null).length, thieuQK = d.precipitation_sum.slice(off,-4).filter(v=>v==null).length;
     const sr = satRainFor(s.id); let satDays = 0;          // ngày đã qua: lấy max(Open-Meteo, vệ tinh)
     if(sr) for(let t=0;t<=off+PAST_DAYS;t++){ const x=sr[tmF[t]]; if(x!=null&&x>prF[t]){ prF[t]=x; satDays++; } }
     const pr = prF.slice(off), time = tmF.slice(off);
     const lop = QD18 ? lopCua(s) : null;
-    const o = Object.assign({},s,{pr,time,prF,tmF,off,lop,days:evalStation(pr,time,s.type==='da',lop,GIO&&GIO[i]),satDays});
+    const o = Object.assign({},s,{pr,time,prF,tmF,off,lop,days:evalStation(pr,time,s.type==='da',lop,GIO&&GIO[i]),satDays,thieuDB,thieuQK});
     if(s.type!=='da'&&window.OD){                            // ổn định mái theo mưa + SWCC (không áp dụng cho vách đá)
       const p=OD.thamSo(s,null,DH), ser=OD.chuoiFS(prF,p), a0=off+PAST_DAYS-14;
       o.odp=p; o.od={beta:p.beta_tinh,nguon:p.nguon_doc,D:p.D,FSkho:OD.fsKho(p)};
@@ -626,6 +652,7 @@ async function fetchForecast(){
     }
     return o;
   });
+  LECH_NGAY = (!REPLAY && res.length && res[0].days[0].date!==homNayVN()) ? res[0].days[0].date : null;
   const ens = await ensP; ENS_N = 0;
   if(ens) res.forEach((s,i)=>{
     const m=ensMembers(ens[i]); const pe=ensProb(s.pr,s.time,m.times,m.cols,s.type==='da',s.lop); if(!pe) return;
@@ -769,9 +796,16 @@ function renderStatus(){
   document.getElementById('st-txt').textContent=LV_TXT[worst]+(REPLAY?' trong 4 ngày từ '+fmtD(REPLAY)+'/'+REPLAY.slice(0,4):' trong 4 ngày tới');
   document.getElementById('st-sub').textContent=(worst>=2?'Sớm nhất: '+DAY_TXT[wd.k].toLowerCase()+' tại '+wd.s.id+'. ':'')+
     (REPLAY?'Xem lại bằng số liệu mưa lưu trữ Open-Meteo.':'Cập nhật lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+
-      (ENS_N?' · tổ hợp '+ENS_N+' kịch bản ECMWF, GFS':' · chưa có dự báo tổ hợp'));
+      (ENS_N?' · tổ hợp '+ENS_N+' kịch bản ECMWF, GFS':' · chưa có dự báo tổ hợp'))+canhBaoDuLieu();
   return {worst,wd};
 }
+function canhBaoDuLieu(){                        // chất lượng số liệu đầu vào của lần tính này
+  if(!RESULT) return ''; let t='';
+  const nDB=RESULT.filter(s=>s.thieuDB>0).length, nQK=RESULT.filter(s=>s.thieuQK>2).length;
+  if(nDB) t+=' · THIẾU mưa dự báo ở '+nDB+' điểm (đang tính là 0 mm): mức cảnh báo có thể thấp hơn thực tế';
+  else if(nQK) t+=' · thiếu số liệu mưa nhiều ngày đã qua ở '+nQK+' điểm: mức cảnh báo có thể thấp hơn thực tế';
+  if(LECH_NGAY) t+=' · Số liệu mưa mới nhất bắt đầu từ ngày '+fmtD(LECH_NGAY)+', khác ngày hôm nay: kiểm tra kết nối hoặc đồng hồ của máy';
+  return t; }
 const HUONG_DAN = [   // cảnh báo dựa trên tác động (WMO-No. 1150) – giống chuan_quoc_te.py
   ['Duy trì tuần tra định kỳ các điểm nguy cơ.','Lưu thông bình thường, chú ý biển báo đoạn đèo dốc.'],
   ['Theo dõi dự báo 6 giờ/lần; kiểm tra rãnh, cống, các điểm nguy cơ; chuẩn bị vật tư, biển báo, máy xúc.','Chú ý đá rơi ở đoạn vách dốc; không dừng đỗ dưới chân vách, taluy.'],
@@ -875,17 +909,25 @@ async function run(){
   await loadServer(); renderFSMethod(); renderAI();
   await loadSat(); loadInsar(); loadNhayCam();
   try{
-    RESULT=await fetchForecast(); setDay(DAY);
+    RESULT=await fetchForecast(); if(!REPLAY) DAY_TXT=DAY_TXT_GOC.slice(); setDay(DAY);
     if(REPLAY){ renderStatus(); showEvents(); }
-    else{ notify(renderStatus()); try{ localStorage.setItem('ql6_du_bao',JSON.stringify({t:Date.now(),r:RESULT})); }catch(_){} }
+    else{ notify(renderStatus()); try{ localStorage.setItem(KHOA_LUU,JSON.stringify({t:Date.now(),r:RESULT})); }catch(_){} }
   }catch(e){
-    let saved=null; try{ saved=JSON.parse(localStorage.getItem('ql6_du_bao')||'null'); }catch(_){}
-    if(saved&&saved.r&&!REPLAY){
-      RESULT=saved.r; setDay(DAY); renderStatus();
-      const t=new Date(saved.t);
+    let saved=null; try{ saved=JSON.parse(localStorage.getItem(KHOA_LUU)||'null'); }catch(_){}
+    let dung=false;
+    if(!REPLAY&&luuHopLe(saved)){ try{
+      RESULT=deepEsc(saved.r); RESULT.forEach((s,i)=>{ s.id=DATA.stations[i].id; s.note=DATA.stations[i].note; });
+      const cu=RESULT[0].days[0].date!==homNayVN();          // dự báo lưu từ ngày khác: ghi ngày thật, không gọi là 'Hôm nay'
+      DAY_TXT=cu?['Ngày lưu','+1 ngày','+2 ngày','+3 ngày']:DAY_TXT_GOC.slice();
+      LECH_NGAY=null; ENS_N=0; setDay(DAY); renderStatus();
+      const t=new Date(+saved.t);
+      if(cu){ document.getElementById('st-dot').style.background='#5B6A70'; document.getElementById('st-txt').textContent='Dự báo cũ – chưa cập nhật được'; }
       document.getElementById('st-sub').textContent=(navigator.onLine?'Chưa cập nhật được. ':'Mất kết nối mạng. ')+
-        'Đang xem dự báo lưu lúc '+t.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+' ngày '+t.toLocaleDateString('vi-VN')+'.';
-    }else{
+        'Đang xem dự báo lưu lúc '+t.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+' ngày '+t.toLocaleDateString('vi-VN')+
+        (cu?' – KHÔNG phải dự báo của hôm nay.':'.');
+      dung=true;
+    }catch(_){ RESULT=null; try{ localStorage.removeItem(KHOA_LUU); }catch(__){} } }
+    if(!dung){
       document.getElementById('st-dot').style.background='#5B6A70';
       document.getElementById('st-txt').textContent=navigator.onLine?'Chưa lấy được dự báo':'Mất kết nối mạng';
       document.getElementById('st-sub').textContent=e.message+'. Kiểm tra kết nối mạng rồi bấm Cập nhật ngay.';
@@ -909,7 +951,7 @@ function showEvents(){
 }
 function setMode(iso){
   REPLAY=iso||null; document.body.classList.toggle('xem-lai',!!REPLAY);
-  DAY_TXT=REPLAY?['Ngày xem','+1 ngày','+2 ngày','+3 ngày']:['Hôm nay','Ngày mai','+2 ngày','+3 ngày'];
+  DAY_TXT=REPLAY?['Ngày xem','+1 ngày','+2 ngày','+3 ngày']:DAY_TXT_GOC.slice();
   document.getElementById('btn-live').hidden=!REPLAY; document.getElementById('btn-refresh').hidden=!!REPLAY;
   const u=new URL(location.href); if(REPLAY) u.searchParams.set('ngay',REPLAY); else u.searchParams.delete('ngay');
   try{ history.replaceState(null,'',u); }catch(_){}
@@ -919,12 +961,12 @@ function setMode(iso){
   const inp=document.getElementById('replay-date'); const max=addDays(new Date().toISOString().slice(0,10),-4); inp.max=max;
   document.getElementById('btn-replay').onclick=()=>{
     const v=inp.value; if(!v){alert('Chọn một ngày trước.');return;}
-    if(v>max||v<'2022-02-15'){alert('Chọn ngày từ 15/02/2022 đến '+max.split('-').reverse().join('/')+' (cần đủ 3 ngày sau ngày xem).');return;}
+    if(!ngayHopLe(v)||v>max||v<'2022-02-15'){alert('Chọn ngày từ 15/02/2022 đến '+max.split('-').reverse().join('/')+' (cần đủ 3 ngày sau ngày xem).');return;}
     setMode(v);
   };
   document.getElementById('btn-live').onclick=()=>setMode(null);
   const q=new URLSearchParams(location.search).get('ngay');
-  if(q&&/^\d{4}-\d{2}-\d{2}$/.test(q)&&q<=max){ inp.value=q; setMode(q); } else run();
+  if(q&&ngayHopLe(q)&&q<=max&&q>='2022-02-15'){ inp.value=q; setMode(q); } else run();
 })();
 setInterval(()=>{ if(!REPLAY) run(); },REFRESH_MIN*60*1000);
 (function(){ const sc=document.createElement('script'); sc.src='../danh_gia_anh.js'; document.body.appendChild(sc); })();
