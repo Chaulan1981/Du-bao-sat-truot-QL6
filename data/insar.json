@@ -1,5 +1,5 @@
 {
- "cap_nhat": "2026-11-12 17:22",
+ "cap_nhat": "2026-11-12 20:44",
  "trang_thai": "ok",
  "nguon": "Sentinel-1 (ESA Copernicus), giao thoa ASF HyP3 INSAR_ISCE_MULTI_BURST 80 m, chuỗi thời gian SBAS",
  "quy_uoc": "Tốc độ theo hướng nhìn vệ tinh (LOS, mm/năm): dương = về phía vệ tinh, âm = ra xa",
@@ -23,11 +23,11 @@
   {
    "ma": "T128A-KV1",
    "vet": "128A",
-   "so_giao_thoa": 128,
-   "so_ngay_chup": 32,
+   "so_giao_thoa": 133,
+   "so_ngay_chup": 33,
    "tu": "2025-10-04",
-   "den": "2026-10-30",
-   "diem_anh_tin_cay": 766,
+   "den": "2026-11-11",
+   "diem_anh_tin_cay": 803,
    "diem_anh_hanh_lang": 10587,
    "trang_thai": "ok"
   }
@@ -86,21 +86,21 @@
   "KV1-Km116": {
    "n": 43,
    "v_tv": 3.8,
-   "v_max": 11.8,
-   "p90": 7.2,
+   "v_max": 12.4,
+   "p90": 7.5,
    "ty_le_20": 0.0,
-   "v90_max": 13.0,
-   "v_doc": -5.8,
+   "v90_max": 33.1,
+   "v_doc": -5.6,
    "muc": 0
   },
   "KV1-Km119": {
-   "n": 14,
-   "v_tv": -4.2,
-   "v_max": -15.1,
-   "p90": 11.2,
+   "n": 15,
+   "v_tv": -5.8,
+   "v_max": -18.3,
+   "p90": 14.6,
    "ty_le_20": 0.0,
-   "v90_max": -20.6,
-   "v_doc": 8.2,
+   "v90_max": -14.5,
+   "v_doc": 9.8,
    "muc": 1
   }
  },
