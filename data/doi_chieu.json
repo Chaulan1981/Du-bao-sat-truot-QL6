@@ -1,0 +1,415 @@
+{
+ "cap_nhat": "2026-11-24 17:20",
+ "vung": "QL6",
+ "tieu_chi": {
+  "cua_so_ngay": [
+   -3,
+   1
+  ],
+  "muc_bat": 2,
+  "gan_km": 10.0
+ },
+ "luu_tru": {
+  "tu": "2026-10-03",
+  "den": "2026-11-24"
+ },
+ "mua_lich_su": {
+  "tu": "2023-01-01",
+  "den": "2026-10-01"
+ },
+ "tong": {
+  "so_su_kien": 11,
+  "trong_pham_vi": 8,
+  "ngoai_pham_vi": 3,
+  "do_mua": 5,
+  "khong_do_mua": 1,
+  "chua_ro": 2,
+  "da_phat": {
+   "so_su_kien": 0,
+   "bat": 0,
+   "dung_ngay": 0,
+   "bao_truoc": 0
+  },
+  "tinh_lai": {
+   "so_su_kien": 5,
+   "bat": 3,
+   "dung_ngay": 3
+  },
+  "khong_do_mua_tinh_lai": {
+   "so_su_kien": 1,
+   "bat": 0,
+   "dung_ngay": 0
+  },
+  "dot_bao_dong": {
+   "so_dot": 0,
+   "co_su_kien": 0,
+   "dang_dien_ra": 0,
+   "so_ngay": 0
+  }
+ },
+ "su_kien": [
+  {
+   "id": "QL6-2023-08-04",
+   "ngay": "2023-08-04",
+   "mo_ta": "Km128+740 Thung Khe: đá lăn",
+   "do_mua": null,
+   "nguon": "báo chí; kiem_dinh/backtest_2020_now.py",
+   "loai": "đá",
+   "pham_vi": "trong",
+   "kv": "KV1",
+   "xy": [
+    105.0769,
+    20.6961
+   ],
+   "diem_gan": "KV1-Km128",
+   "cach_diem_km": 0.6,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2023-08-03",
+    "diem": "KV1-Km116",
+    "mua_mm": 41.6,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "QL6-2023-09-27",
+   "ngay": "2023-09-27",
+   "mo_ta": "Dốc Cun (Hòa Bình): sạt taluy dương",
+   "do_mua": true,
+   "nguon": "báo chí; kiem_dinh/backtest_2020_now.py",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "ghi_chu": "Ngoài 3 đoạn đang dự báo (Km79)"
+  },
+  {
+   "id": "QL6-2024-08-24",
+   "ngay": "2024-08-24",
+   "mo_ta": "Dốc Cun Km79+335: sạt taluy âm và dương",
+   "do_mua": true,
+   "nguon": "báo chí; kiem_dinh/backtest_2020_now.py",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "ghi_chu": "Ngoài 3 đoạn đang dự báo (Km79)"
+  },
+  {
+   "id": "QL6-2024-09-08",
+   "ngay": "2024-09-08",
+   "mo_ta": "Bão Yagi: hơn 50 vị trí sụt taluy QL6 qua Hòa Bình (7–9/9)",
+   "do_mua": true,
+   "nguon": "Cục Đường bộ, báo chí",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "KV1",
+   "ghi_chu": "Sự cố diện rộng, gán cho đoạn KV1",
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 3,
+    "bat": true,
+    "muc_dung_ngay": 3,
+    "ngay_muc_cao_nhat": "2024-09-08",
+    "diem": "KV1-Km128",
+    "mua_mm": 109.5,
+    "ly_do": "ổn định mái (FS)"
+   }
+  },
+  {
+   "id": "QL6-2025-08-31",
+   "ngay": "2025-08-31",
+   "mo_ta": "Km121+700 Thung Khe: đá đổ chắn đường (5 ngày sau mưa 270 mm, bão số 5)",
+   "do_mua": true,
+   "nguon": "báo chí",
+   "loai": "đá",
+   "pham_vi": "trong",
+   "kv": "KV1",
+   "xy": [
+    105.1214,
+    20.6693
+   ],
+   "diem_gan": "KV1-Km122",
+   "cach_diem_km": 0.2,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2025-08-30",
+    "diem": "KV1-Km122",
+    "mua_mm": 30.7,
+    "ly_do": "duy trì sau mưa"
+   }
+  },
+  {
+   "id": "QL6-2025-12-14",
+   "ngay": "2025-12-14",
+   "mo_ta": "Km124+300 Thung Khe: đổ lở đá, 3 người tử vong (trời gần như không mưa)",
+   "do_mua": false,
+   "nguon": "Cục Đường bộ; khảo sát ĐH GTVT 13/01/2026",
+   "loai": "đá",
+   "pham_vi": "trong",
+   "kv": "KV1",
+   "xy": [
+    105.1033,
+    20.6777
+   ],
+   "diem_gan": "Km124+300 (khối trượt 14/12/2025)",
+   "cach_diem_km": 0.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2025-12-13",
+    "diem": "KV1-Km116",
+    "mua_mm": 8.6,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "QL6-2026-05-17",
+   "ngay": "2026-05-17",
+   "mo_ta": "Km118+700 Đèo Đá Trắng: đá rơi trúng người đi xe máy",
+   "do_mua": null,
+   "nguon": "báo chí; GPS vTools 27/9/2026",
+   "loai": "đá",
+   "pham_vi": "trong",
+   "kv": "KV1",
+   "xy": [
+    105.1427,
+    20.66
+   ],
+   "diem_gan": "Km118+700 Đá Trắng (đá rơi 17/5/2026)",
+   "cach_diem_km": 0.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-05-16",
+    "diem": "KV1-Km116",
+    "mua_mm": 16.2,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "QL6-2026-05-24",
+   "ngay": "2026-05-24",
+   "mo_ta": "Mưa 21–25/5: sạt taluy Km421+450, Km460+930 (Điện Biên)",
+   "do_mua": true,
+   "nguon": "báo chí; quyết định tình huống khẩn cấp 2/7/2026",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "ghi_chu": "Ngoài đoạn KV3 (Km405–416)"
+  },
+  {
+   "id": "QL6-2026-07-09",
+   "ngay": "2026-07-09",
+   "mo_ta": "Đèo Huổi Lóng: sạt taluy, cấm đường từ 10h30 ngày 8/7; mưa lớn 5–9/7, trạm Mường Mùn 149 mm",
+   "do_mua": true,
+   "nguon": "báo chí",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "KV3",
+   "ghi_chu": "Chưa có tọa độ GPS; gán cho đoạn KV3",
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-08",
+    "diem": "KV3-Km405",
+    "mua_mm": 27.1,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "QL6-2026-07-16",
+   "ngay": "2026-07-16",
+   "mo_ta": "Đèo Huổi Lóng sạt lại, cấm đường từ 18h15",
+   "do_mua": true,
+   "nguon": "báo chí",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "KV3",
+   "ghi_chu": "Sạt lại sau mưa 8–9/7; chưa có tọa độ GPS",
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-16",
+    "diem": "KV3-Km405",
+    "mua_mm": 28.1,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "QL6-2026-08-05",
+   "ngay": "2026-08-05",
+   "mo_ta": "Đèo Chiềng Pấc Km322–323 (Sơn La): sạt taluy, ô tô bị vùi; trạm Bon Phặng 138,4 mm",
+   "do_mua": true,
+   "nguon": "báo chí",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "KV2",
+   "ghi_chu": "Cách đầu đoạn KV2 (Km330) khoảng 7 km; gán cho KV2 như các kiểm định trước",
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-08-04",
+    "diem": "KV2-Km339",
+    "mua_mm": 30.3,
+    "ly_do": "ổn định mái (FS)"
+   }
+  }
+ ],
+ "dot_bao_dong": [],
+ "vi_tri": {
+  "nguon": "điểm trượt QL6 điều tra thực địa và giải đoán ảnh",
+  "so_diem_truot": 397,
+  "so_diem_du_bao": 22,
+  "ty_le_trong_km": {
+   "1": 0.02,
+   "3": 0.106,
+   "5": 0.134
+  },
+  "cach_trung_vi_km": 23.1,
+  "diem_du_bao_co_diem_truot_1km": 3,
+  "phan_biet": {
+   "nhay_cam_ai": {
+    "n_co": 3,
+    "n_khong": 16,
+    "tb_co": 0.293,
+    "tb_khong": 0.309,
+    "auc": 0.51
+   },
+   "do_doc": {
+    "n_co": 3,
+    "n_khong": 16,
+    "tb_co": 31.3,
+    "tb_khong": 31.837,
+    "auc": 0.479
+   }
+  },
+  "doan_chua_co_diem": [
+   {
+    "ly_trinh_km": [
+     180,
+     190
+    ],
+    "so_diem_truot": 49,
+    "tam": [
+     104.5463,
+     20.8934
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     360,
+     370
+    ],
+    "so_diem_truot": 26,
+    "tam": [
+     103.4004,
+     21.7547
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     240,
+     250
+    ],
+    "so_diem_truot": 25,
+    "tam": [
+     104.109,
+     21.1717
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     350,
+     360
+    ],
+    "so_diem_truot": 23,
+    "tam": [
+     103.4374,
+     21.6696
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     60,
+     70
+    ],
+    "so_diem_truot": 22,
+    "tam": [
+     105.3556,
+     20.8354
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     340,
+     350
+    ],
+    "so_diem_truot": 18,
+    "tam": [
+     103.4059,
+     21.5728
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     140,
+     150
+    ],
+    "so_diem_truot": 17,
+    "tam": [
+     104.8834,
+     20.7907
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     70,
+     80
+    ],
+    "so_diem_truot": 17,
+    "tam": [
+     105.3279,
+     20.7552
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     410,
+     420
+    ],
+    "so_diem_truot": 14,
+    "tam": [
+     103.1559,
+     22.0808
+    ]
+   },
+   {
+    "ly_trinh_km": [
+     250,
+     260
+    ],
+    "so_diem_truot": 14,
+    "tam": [
+     104.0641,
+     21.1985
+    ]
+   }
+  ],
+  "ghi_chu_ly_trinh": "Lý trình tính theo chiều dài tim tuyến từ Hà Nội (du_lieu/QL6_Tuyen_WGS84.csv), lệch lý trình chính thức ở đoạn Sơn La – Điện Biên."
+ }
+}

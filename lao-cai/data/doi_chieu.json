@@ -1,0 +1,1184 @@
+{
+ "cap_nhat": "2026-11-24 17:20",
+ "vung": "Lào Cai",
+ "tieu_chi": {
+  "cua_so_ngay": [
+   -3,
+   1
+  ],
+  "muc_bat": 2,
+  "gan_km": 10.0
+ },
+ "luu_tru": {
+  "tu": "2026-10-03",
+  "den": "2026-11-24"
+ },
+ "mua_lich_su": {
+  "tu": "2023-01-01",
+  "den": "2026-10-01"
+ },
+ "tong": {
+  "so_su_kien": 41,
+  "trong_pham_vi": 34,
+  "ngoai_pham_vi": 7,
+  "do_mua": 33,
+  "khong_do_mua": 1,
+  "chua_ro": 0,
+  "da_phat": {
+   "so_su_kien": 0,
+   "bat": 0,
+   "dung_ngay": 0,
+   "bao_truoc": 0
+  },
+  "tinh_lai": {
+   "so_su_kien": 33,
+   "bat": 20,
+   "dung_ngay": 11
+  },
+  "khong_do_mua_tinh_lai": {
+   "so_su_kien": 1,
+   "bat": 0,
+   "dung_ngay": 0
+  },
+  "dot_bao_dong": {
+   "so_dot": 13,
+   "co_su_kien": 0,
+   "dang_dien_ra": 0,
+   "so_ngay": 13
+  }
+ },
+ "su_kien": [
+  {
+   "id": "LC-2024-09-09",
+   "ngay": "2024-09-09",
+   "mo_ta": "Bão Yagi: sạt taluy, đất tràn mặt đường tại 20 điểm QL70 (Yên Bái)",
+   "do_mua": true,
+   "nguon": "báo chí; kiem_dinh/on_dinh_su_kien.py",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL70",
+   "ghi_chu": "Sự cố diện rộng, gán cho tuyến QL70",
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 3,
+    "bat": true,
+    "muc_dung_ngay": 3,
+    "ngay_muc_cao_nhat": "2024-09-09",
+    "diem": "QL70-175",
+    "mua_mm": 202.8,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2025-09-29",
+   "ngay": "2025-09-29",
+   "mo_ta": "Đèo Khau Phạ QL32: 30–40 điểm sạt từ 29/9, Km269 sụt khoảng 30 m đường",
+   "do_mua": true,
+   "nguon": "báo chí; kiem_dinh/on_dinh_su_kien.py",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 3,
+    "bat": true,
+    "muc_dung_ngay": 3,
+    "ngay_muc_cao_nhat": "2025-09-29",
+    "diem": "QL32-80",
+    "mua_mm": 195.0,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-01",
+   "ngay": "2026-05-04",
+   "mo_ta": "QL4D Km120+900 Tả Phìn: đá đổ taluy dương, tắc đường",
+   "do_mua": true,
+   "nguon": "tienphong.vn/…post1840418",
+   "loai": "đá",
+   "pham_vi": "trong",
+   "kv": "QL4D",
+   "xy": [
+    103.9,
+    22.38
+   ],
+   "diem_gan": "QL4D-75",
+   "cach_diem_km": 2.6,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-05-03",
+    "diem": "QL4D-70",
+    "mua_mm": 30.8,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-02",
+   "ngay": "2026-05-10",
+   "mo_ta": "QL4D Km98+300 Ô Quy Hồ: taluy mất ổn định, hố sụt",
+   "do_mua": true,
+   "nguon": "vtv.vn/…100260511085638872",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL4D",
+   "xy": [
+    103.78,
+    22.35
+   ],
+   "diem_gan": "QL4D-50",
+   "cach_diem_km": 0.8,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-05-07",
+    "diem": "QL4D-35",
+    "mua_mm": 32.4,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-03",
+   "ngay": "2026-07-02",
+   "mo_ta": "Đường Tả Ngảo–Bản Pho (Bát Xát): sạt taluy âm",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post903179",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4E",
+   "xy": [
+    103.85,
+    22.55
+   ],
+   "diem_gan": "QL4E-105",
+   "cach_diem_km": 2.1,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-07-01",
+    "diem": "QL4E-90",
+    "mua_mm": 85.0,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-04",
+   "ngay": "2026-07-04",
+   "mo_ta": "QL32 Háng Cháng Lừ, Khao Mang: đất đá lấp cống (hoàn lưu bão số 1)",
+   "do_mua": true,
+   "nguon": "danviet.vn/…d1440794",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "xy": [
+    104.03,
+    21.9
+   ],
+   "diem_gan": "QL32-20",
+   "cach_diem_km": 4.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-01",
+    "diem": "QL32-120",
+    "mua_mm": 101.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-05",
+   "ngay": "2026-07-04",
+   "mo_ta": "Sín Chéng (Si Ma Cai): sạt sau nhà, 2 nhà",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post903331",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    104.25,
+    22.7
+   ],
+   "diem_gan": "QL4E-0",
+   "cach_diem_km": 14.0
+  },
+  {
+   "id": "LC-2026-06",
+   "ngay": "2026-07-05",
+   "mo_ta": "Suối Háng Chú, Mù Cang Chải: đất đá lấp suối",
+   "do_mua": true,
+   "nguon": "tienphong.vn/…post1860640",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.09,
+    21.85
+   ],
+   "diem_gan": "QL32-30",
+   "cach_diem_km": 0.1,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-07-05",
+    "diem": "QL32-165",
+    "mua_mm": 6.8,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-07",
+   "ngay": "2026-07-08",
+   "mo_ta": "Mường Khương: nhiều điểm sạt ~1.000 m³, 11 nhà",
+   "do_mua": true,
+   "nguon": "bnews.vn/…428179",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4D",
+   "xy": [
+    104.12,
+    22.75
+   ],
+   "diem_gan": "QL4D-10",
+   "cach_diem_km": 1.5,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-07-07",
+    "diem": "QL4D-50",
+    "mua_mm": 26.0,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-08",
+   "ngay": "2026-07-09",
+   "mo_ta": "Lao Chải, phường Sa Pa: sạt sau nhà, di dời 6 hộ (ngày chưa chắc)",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post903553",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4D",
+   "xy": [
+    103.86,
+    22.32
+   ],
+   "diem_gan": "QL4D-65",
+   "cach_diem_km": 2.6,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-07-07",
+    "diem": "QL4D-50",
+    "mua_mm": 26.0,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-09",
+   "ngay": "2026-07-15",
+   "mo_ta": "QL32 Km290+250 Púng Luông: sạt taluy dương",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post903981",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "xy": [
+    104.2,
+    21.79
+   ],
+   "diem_gan": "QL32-50",
+   "cach_diem_km": 3.2,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-16",
+    "diem": "QL32-40",
+    "mua_mm": 43.7,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-10",
+   "ngay": "2026-07-16",
+   "mo_ta": "QL279 Minh Lương: lũ bùn đá vùi cống, nhà dân (mưa 123,6 mm)",
+   "do_mua": true,
+   "nguon": "nongnghiepmoitruong.vn/…d821803",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL279",
+   "xy": [
+    104.13,
+    22.0
+   ],
+   "diem_gan": "QL279-35",
+   "cach_diem_km": 5.4,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-16",
+    "diem": "QL279-5",
+    "mua_mm": 35.6,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-11",
+   "ngay": "2026-07-16",
+   "mo_ta": "QL279 Km143+300, Km147+600 Nậm Xé: 2 điểm sạt, tắc đường (107 mm)",
+   "do_mua": true,
+   "nguon": "vovgiaothong.vn/…d53915",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL279",
+   "xy": [
+    104.08,
+    21.98
+   ],
+   "diem_gan": "QL279-25",
+   "cach_diem_km": 4.1,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-16",
+    "diem": "QL279-5",
+    "mua_mm": 35.6,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-12",
+   "ngay": "2026-07-16",
+   "mo_ta": "Lao Chải (Mù Cang Chải): đất đá vào 6 nhà, sơ tán 36 hộ",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post904125",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.05,
+    21.88
+   ],
+   "diem_gan": "QL32-25",
+   "cach_diem_km": 2.1,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-17",
+    "diem": "QL32-0",
+    "mua_mm": 46.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-13",
+   "ngay": "2026-07-16",
+   "mo_ta": "QL32 xã Mù Cang Chải: 2–3 điểm ~180 m³; đường Kim Nọi",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post904125",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "xy": [
+    104.09,
+    21.85
+   ],
+   "diem_gan": "QL32-30",
+   "cach_diem_km": 0.1,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-17",
+    "diem": "QL32-0",
+    "mua_mm": 46.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-14",
+   "ngay": "2026-07-16",
+   "mo_ta": "Khao Mang: 5 điểm sạt, 3 điểm sụt, 14 nhà",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post904125",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.03,
+    21.9
+   ],
+   "diem_gan": "QL32-20",
+   "cach_diem_km": 4.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-17",
+    "diem": "QL32-0",
+    "mua_mm": 46.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-15",
+   "ngay": "2026-07-16",
+   "mo_ta": "Chế Tạo: hàng trăm điểm sạt đường, cuốn cầu Nả Háng",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post904125",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    104.0,
+    21.72
+   ],
+   "diem_gan": "QL32-20",
+   "cach_diem_km": 16.4
+  },
+  {
+   "id": "LC-2026-16",
+   "ngay": "2026-07-17",
+   "mo_ta": "QL32 Km329+500 Trống Là, Khao Mang: sạt lớn, tắc đường",
+   "do_mua": true,
+   "nguon": "tienphong.vn/…post1860640",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "xy": [
+    104.02,
+    21.91
+   ],
+   "diem_gan": "QL32-20",
+   "cach_diem_km": 4.9,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-17",
+    "diem": "QL32-0",
+    "mua_mm": 46.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-17",
+   "ngay": "2026-07-17",
+   "mo_ta": "ĐT175B Km8+120 (Mù Cang Chải–Mường La)",
+   "do_mua": true,
+   "nguon": "vnexpress.net/…5098980",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.12,
+    21.83
+   ],
+   "diem_gan": "QL32-35",
+   "cach_diem_km": 0.7,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-17",
+    "diem": "QL32-0",
+    "mua_mm": 46.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-18",
+   "ngay": "2026-07-20",
+   "mo_ta": "QL4E Km3 Lùng Phình: sạt, sụt nền đường",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post907652",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL4E",
+   "xy": [
+    104.33,
+    22.62
+   ],
+   "diem_gan": "QL4E-0",
+   "cach_diem_km": 2.9,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-19",
+    "diem": "QL4E-60",
+    "mua_mm": 109.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-19",
+   "ngay": "2026-07-22",
+   "mo_ta": "QL4 Km195 Páo Tủng, Mường Khương: sạt taluy âm dưới nhà",
+   "do_mua": true,
+   "nguon": "bnews.vn/…429867",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4D",
+   "xy": [
+    104.13,
+    22.77
+   ],
+   "diem_gan": "QL4D-5",
+   "cach_diem_km": 2.4,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-19",
+    "diem": "QL4D-90",
+    "mua_mm": 93.5,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-20",
+   "ngay": "2026-07-27",
+   "mo_ta": "QL32 Km328+550 Trống Là: ~800 m³, tắc đường",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post904860",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "xy": [
+    104.02,
+    21.91
+   ],
+   "diem_gan": "QL32-20",
+   "cach_diem_km": 4.9,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 1,
+    "bat": false,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-28",
+    "diem": "QL32-155",
+    "mua_mm": 57.3,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-21",
+   "ngay": "2026-07-28",
+   "mo_ta": "San Lùng, Bản Xèo (Bát Xát): ~36.000 m³, vùi 7 ao cá",
+   "do_mua": true,
+   "nguon": "baotintuc.vn/…post1384209",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4E",
+   "xy": [
+    103.78,
+    22.53
+   ],
+   "diem_gan": "QL4E-40",
+   "cach_diem_km": 9.2,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-29",
+    "diem": "QL4E-60",
+    "mua_mm": 119.8,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-22",
+   "ngay": "2026-07-28",
+   "mo_ta": "Bát Xát: 10 điểm sạt đường ~300 m³",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post904966",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4E",
+   "xy": [
+    103.88,
+    22.54
+   ],
+   "diem_gan": "QL4E-105",
+   "cach_diem_km": 2.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-07-29",
+    "diem": "QL4E-60",
+    "mua_mm": 119.8,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-23",
+   "ngay": "2026-07-31",
+   "mo_ta": "Bản Vai, Bát Xát: sạt taluy sau nhà",
+   "do_mua": true,
+   "nguon": "vtv.vn/…100260801204912568",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4E",
+   "xy": [
+    103.88,
+    22.54
+   ],
+   "diem_gan": "QL4E-105",
+   "cach_diem_km": 2.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-07-29",
+    "diem": "QL4E-60",
+    "mua_mm": 119.8,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-24",
+   "ngay": "2026-08-02",
+   "mo_ta": "Tổ 4 Duyên Hải, phường Lào Cai: sạt sau 2 nhà (Liễu Đô 137 mm)",
+   "do_mua": true,
+   "nguon": "bnews.vn/…431166",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4E",
+   "xy": [
+    103.96,
+    22.51
+   ],
+   "diem_gan": "QL4E-115",
+   "cach_diem_km": 1.8,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-08-01",
+    "diem": "QL4E-80",
+    "mua_mm": 23.1,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-25",
+   "ngay": "2026-08-02",
+   "mo_ta": "Cốc San: 16 nhà dưới mái nguy cơ, sơ tán 24 hộ",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post905284",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL4D",
+   "xy": [
+    103.92,
+    22.47
+   ],
+   "diem_gan": "QL4D-90",
+   "cach_diem_km": 3.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-08-03",
+    "diem": "QL4D-70",
+    "mua_mm": 22.9,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-26",
+   "ngay": "2026-08-03",
+   "mo_ta": "QL4D Km114–126 (Cốc San–Sa Pa): nhiều điểm sạt taluy",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post905251",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL4D",
+   "xy": [
+    103.9,
+    22.38
+   ],
+   "diem_gan": "QL4D-75",
+   "cach_diem_km": 2.6,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-08-04",
+    "diem": "QL4D-15",
+    "mua_mm": 60.2,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-27",
+   "ngay": "2026-08-04",
+   "mo_ta": "QL4D Km117 Trung Chải, Tả Phìn: ~200–2.000 m³",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post905300",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL4D",
+   "xy": [
+    103.88,
+    22.37
+   ],
+   "diem_gan": "QL4D-70",
+   "cach_diem_km": 0.9,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-08-04",
+    "diem": "QL4D-15",
+    "mua_mm": 60.2,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-28",
+   "ngay": "2026-08-05",
+   "mo_ta": "Thủy điện Mý Háng Tầu, Chế Tạo: sạt lớn, 1 người chết",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post905483",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    104.0,
+    21.72
+   ],
+   "diem_gan": "QL32-20",
+   "cach_diem_km": 16.4
+  },
+  {
+   "id": "LC-2026-29",
+   "ngay": "2026-08-06",
+   "mo_ta": "ĐT161 Km59+120 Bảo Hà: mất 30–50 m đường, sâu 20 m",
+   "do_mua": true,
+   "nguon": "bnews.vn/…431729",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL279",
+   "xy": [
+    104.33,
+    22.17
+   ],
+   "diem_gan": "QL279-70",
+   "cach_diem_km": 2.4,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-08-06",
+    "diem": "QL279-0",
+    "mua_mm": 35.3,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-30",
+   "ngay": "2026-08-08",
+   "mo_ta": "Điện Quan, Thượng Hà (Bảo Yên): sạt sập 1 nhà",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post905703",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    104.46,
+    22.1
+   ],
+   "diem_gan": "QL70-105",
+   "cach_diem_km": 13.2
+  },
+  {
+   "id": "LC-2026-31",
+   "ngay": "2026-09-14",
+   "mo_ta": "QL32 Km265+900 Tú Lệ: sạt taluy, tắc đường (174,6 mm)",
+   "do_mua": true,
+   "nguon": "bnews.vn/…436904",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL32",
+   "xy": [
+    104.29,
+    21.78
+   ],
+   "diem_gan": "QL32-75",
+   "cach_diem_km": 1.2,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-09-15",
+    "diem": "QL32-140",
+    "mua_mm": 118.1,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-32",
+   "ngay": "2026-09-14",
+   "mo_ta": "Phình Hồ (Trạm Tấu): sạt đường nối QL32–TL174 (132,6 mm)",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post909681",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.42,
+    21.63
+   ],
+   "diem_gan": "QL32-110",
+   "cach_diem_km": 7.6,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-09-15",
+    "diem": "QL32-140",
+    "mua_mm": 118.1,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-33",
+   "ngay": "2026-09-14",
+   "mo_ta": "Mỏ Vàng (Văn Yên): 10 điểm sạt, sụt ~1.000 m³",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post909673",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.47,
+    21.8
+   ],
+   "diem_gan": "QL32-100",
+   "cach_diem_km": 9.5,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 1,
+    "ngay_muc_cao_nhat": "2026-09-15",
+    "diem": "QL32-140",
+    "mua_mm": 118.1,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-34",
+   "ngay": "2026-09-15",
+   "mo_ta": "Cầu Thia (Nghĩa Lộ): mất 30 m đường, 50 m kè (129,4 mm)",
+   "do_mua": true,
+   "nguon": "nhandan.vn/…post988879",
+   "loai": "đất",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.51,
+    21.59
+   ],
+   "diem_gan": "QL32-125",
+   "cach_diem_km": 2.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 2,
+    "bat": true,
+    "muc_dung_ngay": 2,
+    "ngay_muc_cao_nhat": "2026-09-15",
+    "diem": "QL32-140",
+    "mua_mm": 118.1,
+    "ly_do": "mưa"
+   }
+  },
+  {
+   "id": "LC-2026-35",
+   "ngay": "2026-09-15",
+   "mo_ta": "Hạnh Phúc, Trạm Tấu: sạt taluy âm dưới nhà, đường Trạm Tấu–Bắc Yên",
+   "do_mua": true,
+   "nguon": "bnews.vn/…437180",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    104.4,
+    21.47
+   ],
+   "diem_gan": "QL32-130",
+   "cach_diem_km": 17.4
+  },
+  {
+   "id": "LC-2026-36",
+   "ngay": "2026-09-19",
+   "mo_ta": "Tân Hợp (Văn Yên): 5.000–10.000 m³, cô lập 37 hộ",
+   "do_mua": true,
+   "nguon": "vietnamplus.vn/…post1137801",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    104.6,
+    21.8
+   ],
+   "diem_gan": "QL32-115",
+   "cach_diem_km": 18.2
+  },
+  {
+   "id": "LC-2026-37",
+   "ngay": "2026-09-23",
+   "mo_ta": "Thác Tiên, Mỏ Vàng: đá đổ sập 1 nhà",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post910279",
+   "loai": "đá",
+   "pham_vi": "gan",
+   "kv": "QL32",
+   "xy": [
+    104.47,
+    21.8
+   ],
+   "diem_gan": "QL32-100",
+   "cach_diem_km": 9.5,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-09-24",
+    "diem": "QL32-0",
+    "mua_mm": 10.4,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-38",
+   "ngay": "2026-09-30",
+   "mo_ta": "QL279 Km79+200 Bảo Hà: 10.000–25.000 m³, tắc đường – không mưa",
+   "do_mua": false,
+   "nguon": "baolaocai.vn/…post910715",
+   "loai": "đất",
+   "pham_vi": "trong",
+   "kv": "QL279",
+   "xy": [
+    104.37,
+    22.19
+   ],
+   "diem_gan": "QL279-75",
+   "cach_diem_km": 2.0,
+   "da_phat": null,
+   "tinh_lai": {
+    "muc": 0,
+    "bat": false,
+    "muc_dung_ngay": 0,
+    "ngay_muc_cao_nhat": "2026-09-27",
+    "diem": "QL279-120",
+    "mua_mm": 8.9,
+    "ly_do": null
+   }
+  },
+  {
+   "id": "LC-2026-39",
+   "ngay": "2026-10-05",
+   "mo_ta": "Đường Thanh Phú–Suối Thầu, thôn Suối Thầu Dao (Mường Bo): ~700 m³, tắc 3 thôn (mưa đêm 3/10–sáng 5/10)",
+   "do_mua": true,
+   "nguon": "baolaocai.vn/…post911136",
+   "loai": "đất",
+   "pham_vi": "ngoai",
+   "kv": null,
+   "xy": [
+    103.98,
+    22.24
+   ],
+   "diem_gan": "QL4D-65",
+   "cach_diem_km": 17.1
+  }
+ ],
+ "dot_bao_dong": [
+  {
+   "kv": "QL279",
+   "tu": "2026-10-05",
+   "den": "2026-10-05",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL279",
+   "tu": "2026-11-06",
+   "den": "2026-11-06",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL279",
+   "tu": "2026-11-13",
+   "den": "2026-11-13",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL32",
+   "tu": "2026-10-05",
+   "den": "2026-10-05",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL32",
+   "tu": "2026-11-02",
+   "den": "2026-11-02",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL4D",
+   "tu": "2026-11-07",
+   "den": "2026-11-07",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL4D",
+   "tu": "2026-11-13",
+   "den": "2026-11-13",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL4E",
+   "tu": "2026-10-05",
+   "den": "2026-10-05",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL4E",
+   "tu": "2026-11-09",
+   "den": "2026-11-09",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL4E",
+   "tu": "2026-11-13",
+   "den": "2026-11-13",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL70",
+   "tu": "2026-10-05",
+   "den": "2026-10-05",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL70",
+   "tu": "2026-11-06",
+   "den": "2026-11-06",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  },
+  {
+   "kv": "QL70",
+   "tu": "2026-11-13",
+   "den": "2026-11-13",
+   "muc": 2,
+   "so_ngay": 1,
+   "su_kien": [],
+   "dang_dien_ra": false
+  }
+ ],
+ "vi_tri": {
+  "nguon": "điểm sạt trượt khu dân cư đã điều tra (dữ liệu riêng, chỉ công bố số tổng hợp)",
+  "so_diem_truot": 631,
+  "so_diem_du_bao": 149,
+  "ty_le_trong_km": {
+   "1": 0.106,
+   "3": 0.409,
+   "5": 0.518
+  },
+  "cach_trung_vi_km": 4.7,
+  "diem_du_bao_co_diem_truot_1km": 19,
+  "phan_biet": {
+   "nhay_cam_ai": {
+    "n_co": 19,
+    "n_khong": 130,
+    "tb_co": 0.245,
+    "tb_khong": 0.262,
+    "auc": 0.423
+   },
+   "do_doc": {
+    "n_co": 19,
+    "n_khong": 130,
+    "tb_co": 27.947,
+    "tb_khong": 28.563,
+    "auc": 0.463
+   }
+  }
+ }
+}
