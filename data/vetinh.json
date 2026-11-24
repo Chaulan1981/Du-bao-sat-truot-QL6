@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24 05:44",
+ "updated": "2026-11-24 13:58",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -551,18 +551,18 @@
     "anh_moi_nhat": "2026-11-23",
     "so_anh": 22,
     "quang_may_%": 100,
-    "tong_ha": 0.52,
-    "lech_chung_NDVI": 0.002,
+    "tong_ha": 0.53,
+    "lech_chung_NDVI": -0.002,
     "vung": [
      {
       "xy": [
-       105.10346,
-       20.67248
+       105.10343,
+       20.67249
       ],
-      "ha": 0.52,
+      "ha": 0.53,
       "cach_duong_m": 98,
       "dNDVI": -0.29,
-      "km": 123.44
+      "km": 123.45
      }
     ]
    }
