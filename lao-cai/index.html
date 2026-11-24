@@ -210,6 +210,7 @@ details.levels td{border-top:1px solid var(--line);padding:5px 4px;vertical-alig
       3) <b>Ngưỡng hiệu chỉnh trên 37 vụ sạt do mưa năm 2026</b> (mưa mô hình ECMWF IFS 0,25°, mô hình bắt nhiều vụ nhất trong 8 mô hình so sánh):
       mưa ngày từ 60 mm hoặc mưa đợt (các ngày liền nhau từ 5 mm) từ 250 mm → Nguy hiểm; mưa ngày từ 40 mm hoặc mưa đợt từ 200 mm → Cần chú ý.
       Các ngày đã qua dùng mưa lớn hơn giữa ECMWF và mưa vệ tinh IMERG (GSMaP khi IMERG chưa về đủ; vệ tinh hiện về chậm khoảng 2 ngày).
+      <b>Báo bù:</b> khi mưa vệ tinh về trễ cho thấy một ngày trong 3 ngày qua đã đạt mức Nguy hiểm mà hôm đó tuyến chưa được cảnh báo, hôm nay được nâng lên Nguy hiểm.
       Mức cuối là mức cao nhất trong ba cách trên và hệ số an toàn FS.</p>
     <p class="note" id="ai-note"></p>
     <div id="nc-note"></div>
@@ -433,6 +434,7 @@ function levelOf(P,P10,isRock){
    và vùng nguy cơ (gần đúng theo độ dốc DEM); cộng ngưỡng thực nghiệm mưa tích lũy > 250 mm + mưa giờ > 40 mm (Nguyễn Châu Lân, 2024). */
 const NGUONG_MUA = DATA.nguong_mua || 'mai_chau', QD18 = NGUONG_MUA === 'qd18';
 const QD_NGAY_UOT = 5, QD_P_NH = 60, QD_E_NH = 250, QD_P_CY = 40, QD_E_CY = 200;
+const QD_BU_NGAY = 3;                    // số ngày nhìn lại để báo bù (nguong_mua.py mục 4)
 const MO_HINH_MUA = DATA.mo_hinh_mua ? '&models='+DATA.mo_hinh_mua : '';     // Lào Cai: ECMWF IFS 0,25° (bắt nhiều vụ sạt 2026 hơn)
 function chuanMua(l){ const d=l.daily; if(d&&!d.precipitation_sum){ const k=Object.keys(d).find(k=>k.startsWith('precipitation_sum')); if(k) d.precipitation_sum=d[k]; } return l; }
 const QD_NGAY_MUA = 16, QD_TICH_LUY = 250, QD_GIO = 40, LOP_TXT = ['thấp','trung bình','cao','rất cao'];
@@ -453,7 +455,16 @@ function mucQD18(pr,t,l,hmax){
 }
 function lopCua(s){ const g=DH&&DH.diem&&DH.diem[s.id]; return Math.min(3,(g&&g.ai?g.ai.lop:lopNguyCo(g?g.doc:null))+(g&&g.nang?1:0)); }
 // Đánh giá 1 điểm từ chuỗi mưa ngày pr (PAST_DAYS ngày quá khứ + 4 ngày tới); gio: {ngày: mưa giờ lớn nhất}
-function evalStation(pr, times, isRock, lop, gio){
+let DA_PHAT = null;                             // {'đoạn|ngày': mức đã phát trong ngày} từ lưu trữ cảnh báo – cho báo bù
+async function loadDaPhat(){
+  if(DA_PHAT||!QD18) return;
+  try{ const r=await fetch('data/luu_tru/canhbao_lich_su.csv',{cache:'no-store'}); if(!r.ok) return; const L=(await r.text()).split(/\r?\n/), c=L[0].replace(/^\uFEFF/,'').split(',');
+    const iP=c.indexOf('ngay_phat_hanh'), iK=c.indexOf('kv'), iH=c.indexOf('han_ngay'), iD=c.indexOf('ngay_du_bao'), iM=c.indexOf('muc_cao_nhat'); if([iP,iK,iH,iD,iM].includes(-1)) return;
+    const m={}; L.slice(1).forEach(x=>{ const f=x.split(','); if(f[iH]!=='0'||f[iP]!==f[iD]||!ngayHopLe(f[iD])) return; const lv=parseInt(f[iM],10); if(!(lv>=0&&lv<=3)) return;
+      const k=f[iK]+'|'+f[iD]; m[k]=Math.max(m[k]||0,lv); }); DA_PHAT=m;
+  }catch(_){}
+}
+function evalStation(pr, times, isRock, lop, gio, kv){
   const sum=(a,b)=>pr.slice(a,b).reduce((x,y)=>x+y,0);
   const exceed=t=>{ if(QD18||t<10) return false; const P=pr[t]; return P>20 && P/Math.max(MC_A-MC_B*sum(t-10,t),1)>=1; };
   const days=[];
@@ -464,6 +475,12 @@ function evalStation(pr, times, isRock, lop, gio){
       if(exceed(t-j)){ o.persist={days:j,date:times[t-j],P:pr[t-j]}; break; }
     }
     if(o.persist && o.lv<2){ o.lv=2; o.byPersist=true; }
+    if(QD18&&DA_PHAT&&kv){                           // báo bù – giống forecast_alert.evaluate
+      for(let j=1;j<=QD_BU_NGAY;j++){ const tj=t-j; if(tj>=PAST_DAYS||tj<0) continue;
+        const cu=DA_PHAT[kv+'|'+times[tj]]; if(cu==null||cu>=2) continue;
+        const qj=mucQD18(pr,tj,lop==null?2:lop,null); if(qj.lv>=2){ o.bu={days:j,date:times[tj],P:pr[tj],E5:qj.qd18.E5}; break; } }
+      if(o.bu&&o.lv<2){ o.lv=2; o.byBu=true; }
+    }
     days.push(o);
   }
   return days;
@@ -707,7 +724,7 @@ async function fetchForecast(){
     if(sr) for(let t=0;t<=off+PAST_DAYS;t++){ const x=sr[tmF[t]]; if(x!=null&&x>prF[t]){ prF[t]=x; satDays++; } }
     const pr = prF.slice(off), time = tmF.slice(off);
     const lop = QD18 ? lopCua(s) : null;
-    const o = Object.assign({},s,{pr,time,prF,tmF,off,lop,days:evalStation(pr,time,s.type==='da',lop,GIO&&GIO[i]),satDays,thieuDB,thieuQK});
+    const o = Object.assign({},s,{pr,time,prF,tmF,off,lop,days:evalStation(pr,time,s.type==='da',lop,GIO&&GIO[i],s.zone),satDays,thieuDB,thieuQK});
     if(s.type!=='da'&&window.OD){                            // ổn định mái theo mưa + SWCC (không áp dụng cho vách đá)
       const p=OD.thamSo(s,null,DH), ser=OD.chuoiFS(prF,p), a0=off+PAST_DAYS-14;
       o.odp=p; o.od={beta:p.beta_tinh,nguon:p.nguon_doc,D:p.D,FSkho:OD.fsKho(p)};
@@ -742,6 +759,7 @@ async function fetchForecast(){
 }
 function fmtD(iso){return iso.slice(8,10)+'/'+iso.slice(5,7);}
 function muaTxt(d){ return QD18 ? qd18Txt(d) : 'mưa '+d.P.toFixed(0)+' mm, 10 ngày trước '+d.P10.toFixed(0)+' mm; ngưỡng Mai Châu '+d.thr.toFixed(0)+' mm (tỷ số '+d.ratio.toFixed(2)+')'; }
+function buTxt(d){return 'Báo bù: số liệu mưa cập nhật cho thấy ngày '+fmtD(d.bu.date)+' đã mưa '+d.bu.P.toFixed(0)+' mm (mưa đợt '+d.bu.E5.toFixed(0)+' mm), vượt ngưỡng mà hôm đó chưa cảnh báo';}
 function persistTxt(d){return 'Sau mưa vượt ngưỡng ngày '+fmtD(d.persist.date)+' ('+d.persist.P.toFixed(0)+' mm, '+d.persist.days+' ngày trước)';}
 
 /* ---------- Hiển thị ---------- */
@@ -809,6 +827,7 @@ function renderMap(){
        (d.byEns?'<br><b>Mức nâng theo dự báo tổ hợp.</b>':'')+
        (d.byFs?'<br><b>Mức nâng theo hệ số an toàn mái dốc.</b>':'')+
        (d.bySau?'<br><b>Mức nâng theo nguy cơ trượt sâu (nước ngầm dâng sau mưa kéo dài).</b>':'')+
+       (d.byBu?'<br><b>'+buTxt(d)+'.</b>':'')+
        (d.persist?'<br><b>'+persistTxt(d)+'</b>'+(d.byPersist?' – giữ mức Nguy hiểm tới hết '+PERSIST_DAYS+' ngày.':''):'')+
        (s.note?'<br><i>'+s.note+'</i>':'')+'</div>').addTo(stLayer);
   });
@@ -830,6 +849,7 @@ function qd18Txt(x){ const q=x.qd18;
   return 'Mưa '+x.P.toFixed(0)+' mm/24 h sau '+q.n+' ngày mưa, vùng nguy cơ '+LOP_TXT[q.lop]+(q.cap?' → rủi ro cấp '+q.cap+' (QĐ 18/2021)':''); }
 function reasonTxt(x){
   if(x.byPersist) return persistTxt(x);
+  if(x.byBu) return buTxt(x);
   if(x.bySau) return 'Trượt sâu: FS '+fmtVN(x.fsSau.FS,2)+', nước ngầm dâng '+Math.round(x.fsSau.m*100)+'% tầng phủ sau mưa kéo dài';
   if(x.byFs) return fsTxt(x)+'; mưa '+x.P.toFixed(0)+' mm';
   if(x.byEns) return Math.round(x.ens.p3*100)+'% trong '+x.ens.n+' kịch bản đạt ngưỡng trượt; mưa 90%: '+x.ens.P90.toFixed(0)+' mm (dự báo chính '+x.P.toFixed(0)+' mm)';
@@ -973,7 +993,7 @@ function notify(w){
 async function run(){
   const btn=document.getElementById('btn-refresh'); btn.disabled=true; btn.textContent='Đang cập nhật…';
   if(!loadRoad.done){ loadRoad.done=true; await loadRoad(); }
-  await loadServer(); renderFSMethod(); renderAI();
+  await loadServer(); await loadDaPhat(); renderFSMethod(); renderAI();
   await loadSat(); loadInsar(); loadNhayCam(); loadDoiChieu();
   try{
     RESULT=await fetchForecast(); if(!REPLAY) DAY_TXT=DAY_TXT_GOC.slice(); setDay(DAY);
