@@ -1,5 +1,5 @@
 {
- "cap_nhat": "2026-11-24 20:04",
+ "cap_nhat": "2026-11-25 18:48",
  "trang_thai": "ok",
  "nguon": "Sentinel-1 (ESA Copernicus), giao thoa ASF HyP3 INSAR_ISCE_MULTI_BURST 80 m, chuỗi thời gian SBAS",
  "quy_uoc": "Tốc độ theo hướng nhìn vệ tinh (LOS, mm/năm): dương = về phía vệ tinh, âm = ra xa",
@@ -23,11 +23,11 @@
   {
    "ma": "T128A-KV1",
    "vet": "128A",
-   "so_giao_thoa": 133,
-   "so_ngay_chup": 33,
+   "so_giao_thoa": 138,
+   "so_ngay_chup": 34,
    "tu": "2025-10-04",
-   "den": "2026-11-11",
-   "diem_anh_tin_cay": 803,
+   "den": "2026-11-23",
+   "diem_anh_tin_cay": 934,
    "diem_anh_hanh_lang": 10587,
    "trang_thai": "ok"
   }
@@ -86,22 +86,32 @@
   "KV1-Km116": {
    "n": 43,
    "v_tv": 3.8,
-   "v_max": 12.4,
-   "p90": 7.5,
+   "v_max": 12.5,
+   "p90": 7.6,
    "ty_le_20": 0.0,
-   "v90_max": 33.1,
+   "v90_max": 31.2,
    "v_doc": -5.6,
    "muc": 0
   },
   "KV1-Km119": {
-   "n": 15,
+   "n": 16,
    "v_tv": -5.8,
-   "v_max": -18.3,
-   "p90": 14.6,
+   "v_max": -18.0,
+   "p90": 14.2,
    "ty_le_20": 0.0,
-   "v90_max": -14.5,
-   "v_doc": 9.8,
+   "v90_max": -10.8,
+   "v_doc": 10.9,
    "muc": 1
+  },
+  "KV1-Km122": {
+   "n": 20,
+   "v_tv": -0.5,
+   "v_max": -16.1,
+   "p90": 8.3,
+   "ty_le_20": 0.0,
+   "v90_max": -19.6,
+   "v_doc": -1.0,
+   "muc": 0
   }
  },
  "diem_nong": [
