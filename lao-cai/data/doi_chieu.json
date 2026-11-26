@@ -1,5 +1,5 @@
 {
- "cap_nhat": "2026-11-26 21:56",
+ "cap_nhat": "2026-11-27 06:40",
  "vung": "Lào Cai",
  "tieu_chi": {
   "cua_so_ngay": [
@@ -11,7 +11,7 @@
  },
  "luu_tru": {
   "tu": "2026-10-03",
-  "den": "2026-11-26"
+  "den": "2026-11-27"
  },
  "mua_lich_su": {
   "tu": "2023-01-01",
@@ -44,7 +44,7 @@
    "so_dot": 13,
    "co_su_kien": 0,
    "dang_dien_ra": 2,
-   "so_ngay": 15
+   "so_ngay": 17
   }
  },
  "su_kien": [
@@ -1101,9 +1101,9 @@
   {
    "kv": "QL4D",
    "tu": "2026-11-26",
-   "den": "2026-11-26",
+   "den": "2026-11-27",
    "muc": 2,
-   "so_ngay": 1,
+   "so_ngay": 2,
    "su_kien": [],
    "dang_dien_ra": true
   },
@@ -1137,9 +1137,9 @@
   {
    "kv": "QL4E",
    "tu": "2026-11-26",
-   "den": "2026-11-26",
+   "den": "2026-11-27",
    "muc": 2,
-   "so_ngay": 1,
+   "so_ngay": 2,
    "su_kien": [],
    "dang_dien_ra": true
   },
