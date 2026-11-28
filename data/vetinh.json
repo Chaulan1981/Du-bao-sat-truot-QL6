@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-28 03:03",
+ "updated": "2026-11-28 11:45",
  "trang_thai": "ok",
  "loi": [],
  "mua": {
@@ -55,9 +55,9 @@
    48,
    48,
    46,
-   44,
-   10,
-   0,
+   45,
+   38,
+   17,
    0
   ],
   "tram": {
@@ -549,20 +549,20 @@
    "S2": {
     "tu_ngay": "2026-11-08",
     "anh_moi_nhat": "2026-11-23",
-    "so_anh": 22,
+    "so_anh": 18,
     "quang_may_%": 100,
-    "tong_ha": 0.53,
-    "lech_chung_NDVI": -0.002,
+    "tong_ha": 0.54,
+    "lech_chung_NDVI": 0.002,
     "vung": [
      {
       "xy": [
-       105.10343,
+       105.10344,
        20.67249
       ],
-      "ha": 0.53,
+      "ha": 0.54,
       "cach_duong_m": 98,
       "dNDVI": -0.29,
-      "km": 123.45
+      "km": 123.44
      }
     ]
    }
@@ -624,7 +624,7 @@
    "S2": {
     "tu_ngay": "2026-11-08",
     "anh_moi_nhat": "2026-11-26",
-    "so_anh": 5,
+    "so_anh": 4,
     "quang_may_%": 66,
     "tong_ha": 0.0,
     "lech_chung_NDVI": 0.014,
@@ -664,10 +664,10 @@
    "S2": {
     "tu_ngay": "2026-11-08",
     "anh_moi_nhat": "2026-11-26",
-    "so_anh": 5,
+    "so_anh": 4,
     "quang_may_%": 98,
     "tong_ha": 0.0,
-    "lech_chung_NDVI": 0.025,
+    "lech_chung_NDVI": 0.021,
     "vung": []
    }
   }
